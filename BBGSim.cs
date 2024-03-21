@@ -21,6 +21,7 @@ namespace Cheesenaf
         string[] mochaDialogue;
         string[] brettDialogue;
         string[] alanDialogue;
+        string[] berryDialogue;
         string[] playerDialogue;
         string display = "";
         string buffer = "";
@@ -45,7 +46,7 @@ namespace Cheesenaf
 
         Texture2D[] bbgs;
         int emotion = 1;
-        Color[] nametagColor = new Color[4] { new Color(185, 56, 255), new Color(20, 148, 222), new Color(23, 189, 131), new Color(8, 140, 37) };
+        Color[] nametagColor = [new Color(185, 56, 255), new Color(20, 148, 222), new Color(23, 189, 131), new Color(8, 140, 37), new Color(255, 143, 186)];
         Song song;
 
         Texture2D dialogueUI;
@@ -56,29 +57,36 @@ namespace Cheesenaf
         SoundEffectInstance boxZooms;
         public void LoadContent(ContentManager Content)
         {
-            bbgs = new Texture2D[4];
-            if (Game1.saveData.bbg == 0)
+            bbgs = new Texture2D[5];
+            if (Game1.saveData.Bbg == 0)
             {
                 bbgs[0] = Content.Load<Texture2D>("BBGSim/syowen");
                 bbgs[1] = Content.Load<Texture2D>("BBGSim/syowenhappy");
                 bbgs[2] = Content.Load<Texture2D>("BBGSim/syowenneutral");
                 bbgs[3] = Content.Load<Texture2D>("BBGSim/syowenunhappy");
             }
-            if (Game1.saveData.bbg == 1)
+            if (Game1.saveData.Bbg == 1)
             {
                 bbgs[0] = Content.Load<Texture2D>("BBGSim/mocha");
                 bbgs[1] = Content.Load<Texture2D>("BBGSim/mochahappy");
                 bbgs[2] = Content.Load<Texture2D>("BBGSim/mochaneutral");
                 bbgs[3] = Content.Load<Texture2D>("BBGSim/mochaunhappy");
             }
-            if (Game1.saveData.bbg == 2)
+            if (Game1.saveData.Bbg == 2)
             {
                 bbgs[0] = Content.Load<Texture2D>("BBGSim/brett");
                 bbgs[1] = Content.Load<Texture2D>("BBGSim/bretthappy");
                 bbgs[2] = Content.Load<Texture2D>("BBGSim/brettneutral");
                 bbgs[3] = Content.Load<Texture2D>("BBGSim/brettunhappy");
             }
-            if (Game1.saveData.bbg == 3)
+            if (Game1.saveData.Bbg == 3)
+            {
+                bbgs[0] = Content.Load<Texture2D>("BBGSim/alan");
+                bbgs[1] = Content.Load<Texture2D>("BBGSim/alanhappy");
+                bbgs[2] = Content.Load<Texture2D>("BBGSim/alanneutral");
+                bbgs[3] = Content.Load<Texture2D>("BBGSim/alanunhappy");
+            }
+            if (Game1.saveData.Bbg == 4)
             {
                 bbgs[0] = Content.Load<Texture2D>("BBGSim/alan");
                 bbgs[1] = Content.Load<Texture2D>("BBGSim/alanhappy");
@@ -114,7 +122,7 @@ namespace Cheesenaf
         {
             Game1 = game1;
             Game1.ClearColor = Color.LightPink;
-            names = new string[4] { "Syowen", "Mocha", "Brett", "Alan" };
+            names = ["Syowen", "Mocha", "Brett", "Alan", "Berry"];
             syowenDialogue = new string[dialogueCount]
             {
                 "Oh, hey. I'm Syowen. What's your name?", "Huh. {0}, huh?", "You seem pretty cool, want to check out the star festival tonight?", "Awesome, see you there bbg",
@@ -135,13 +143,18 @@ namespace Cheesenaf
                 "Hey there! What's your name?", "Nice to meet you, {0}, I'm Alan!", "Hey theres a star festival thing tonight, you should be there tonight", "Alright, sounds good!",
                 "Oh hey, you're here!", "Awesome, thanks!", "Ohhh. Pizza...", "Yeeeaaah, no I dont have good memories of Pizza.", "Yyyyyeahh.", "Oh. okay bye", "Welcome back, {0}..."
             };
-            playerDialogue = new string[40]
+            berryDialogue = new string[dialogueCount]
             {
-                "Sure!","Nah","Sounds good!","No I don't","Dude I am","Not me lol","Okay","No",
-                "I got you some\n food!","","I got you some\n food!","","I got you some\n food!","","I got you some\n food!","",
-                "What's wrong?","","What's wrong?","","What's wrong?","","What's wrong?","",
-                "With... Pizza?","","From... Pizza?","","Bad stuff?","","You don't?","",
-                "What \nhappened?","","What \nhappened?","","What \nhappened?","","What \nhappened?","",
+                "Hi! My name is Berry, what's yours?", "Nice to meet you, {0}!", "Hey theres a star festival thing tonight, you should come with me there!", "Great! See you there, {0}!",
+                "About time you made it!", "Awe, how thoughtful of you!", "...\niiit's a slice of pizza, yaayyyyy...", "I'm sorry, I just, really haven't had a good experience with pizza, especially with the stuffed crust...", "Yeah, no, none at all.", "Alright, your loss.", "Welcome back, {0}..."
+            };
+            playerDialogue = new string[50]
+            {
+                "Sure!","Nah","Sounds good!","No I don't","Dude I am","Not me lol","Okay","No", "Sure!", "No thanks",
+                "I got you some\n food!","","I got you some\n food!","","I got you some\n food!","","I got you some\n food!","","I got you some\n food!","",
+                "What's wrong?","","What's wrong?","","What's wrong?","","What's wrong?","","What's wrong?","",
+                "With... Pizza?","","From... Pizza?","","Bad stuff?","","You don't?","","Really?","",
+                "What \nhappened?","","What \nhappened?","","What \nhappened?","","What \nhappened?","","What \nhappened?",""
             };
             Game1.Window.TextInput += processTextInput;
             scaleGoal[0] = 1f;
@@ -197,7 +210,7 @@ namespace Cheesenaf
             display = string.Empty;
             if (dialoguePart >= 0)
             {
-                switch (Game1.saveData.bbg)
+                switch (Game1.saveData.Bbg)
                 {
                     default:
                         buffer = WrapText(Game1.BBGFont, syowenDialogue[dialoguePart], wraplimit);
@@ -211,11 +224,14 @@ namespace Cheesenaf
                     case 3:
                         buffer = WrapText(Game1.BBGFont, alanDialogue[dialoguePart], wraplimit);
                         break;
+                    case 4:
+                        buffer = WrapText(Game1.BBGFont, berryDialogue[dialoguePart], wraplimit);
+                        break;
                 }
             }
             else
             {
-                switch (Game1.saveData.bbg)
+                switch (Game1.saveData.Bbg)
                 {
                     default:
                         buffer = WrapText(Game1.BBGFont, syowenDialogue[0], wraplimit);
@@ -228,6 +244,9 @@ namespace Cheesenaf
                         break;
                     case 3:
                         buffer = WrapText(Game1.BBGFont, alanDialogue[0], wraplimit);
+                        break;
+                    case 4:
+                        buffer = WrapText(Game1.BBGFont, berryDialogue[0], wraplimit);
                         break;
                 }
             }
@@ -247,7 +266,7 @@ namespace Cheesenaf
             if (scale[0] == 0 && dialoguePart == 8)
             {
                 Game1.sneakyLoad = true;
-                Game1.saveData.altTitle = true;
+                Game1.saveData.AltTitle = true;
                 Game1.saveData.Night = 1;
                 Game1.Save(Game1.saveData);
                 Game1.ChangeScene(3);
@@ -298,7 +317,7 @@ namespace Cheesenaf
                 }
             }
 
-            if (Game1.GetKeyDown(Keys.Enter))
+            if (Game1.GetKeyDown(Keys.Enter) && display.Length == buffer.Length)
             {
                 switch (dialoguePart)
                 {
@@ -565,19 +584,19 @@ namespace Cheesenaf
                 _spriteBatch.Draw(bbgs[emotion + 1], new Vector2(400, 50), new Rectangle(0, 0, 1600, 1600), Color.White, 0, new Vector2(0, 0), 0.65f, SpriteEffects.None, 0);
             }
             _spriteBatch.Draw(dialogueUI, new Vector2(900, 1000), UIRects[0], Color.White, 0, new Vector2(UIRects[0].Width / 2, UIRects[0].Height / 2), 0.75f * scale[0], SpriteEffects.None, 0);
-            _spriteBatch.Draw(dialogueUI, new Vector2(900, 1000), UIRects[1], nametagColor[Game1.saveData.bbg], -0.35f, new Vector2(1400, 1100), 0.35f * scale[0], SpriteEffects.None, 0);
-                _spriteBatch.DrawString(defaultfont, names[Game1.saveData.bbg], new Vector2(960, 1000), Color.White, -0.35f, new Vector2(300, 235), 1.65f * scale[0], SpriteEffects.None, 0);
+            _spriteBatch.Draw(dialogueUI, new Vector2(900, 1000), UIRects[1], nametagColor[Game1.saveData.Bbg], -0.35f, new Vector2(1400, 1100), 0.35f * scale[0], SpriteEffects.None, 0);
+                _spriteBatch.DrawString(defaultfont, names[Game1.saveData.Bbg], new Vector2(960, 1000), Color.White, -0.35f, new Vector2(300, 235), 1.65f * scale[0], SpriteEffects.None, 0);
             //Input
             _spriteBatch.Draw(dialogueUI, new Vector2(900, 100), UIRects[3], Color.White, 0, new Vector2(UIRects[3].Width / 2, UIRects[3].Height / 2), 0.5f * scale[1], SpriteEffects.None, 0);
             if (userInput != null)
                 _spriteBatch.DrawString(defaultfont, userInput, new Vector2(900, 100), Color.Black, 0, new Vector2(310, 20), scale[1], SpriteEffects.None, 0);
             //Choices
             _spriteBatch.Draw(dialogueUI, new Vector2(1500, 850), UIRects[2], Color.White, 0, new Vector2(UIRects[2].Width / 2, UIRects[2].Height / 2), 0.75f * scale[2], SpriteEffects.None, 0);
-            if (scale[2] == 1 && choicesPulledUp <= 4)
+            if (scale[2] == 1 && choicesPulledUp <= 4 && inChoice)
             {
-                _spriteBatch.DrawString(defaultfont, (selection == 0 ? "> " : "") + playerDialogue[(Game1.saveData.bbg * 2) + (choicesPulledUp * 8)], new Vector2(1400, 775), Color.Chocolate, 0, new Vector2(50, 0), scale[2], SpriteEffects.None, 0);
+                _spriteBatch.DrawString(defaultfont, (selection == 0 ? "> " : "") + playerDialogue[(Game1.saveData.Bbg * 2) + (choicesPulledUp * 10)], new Vector2(1400, 775), Color.Chocolate, 0, new Vector2(50, 0), scale[2], SpriteEffects.None, 0);
                 if (currentSelectionCount >= 2)
-                    _spriteBatch.DrawString(defaultfont, (selection == 1 ? "> " : "") + playerDialogue[((Game1.saveData.bbg * 2) + 1) + (choicesPulledUp * 8)], new Vector2(1500, 900), Color.Chocolate, 0, new Vector2(50, 0), scale[2], SpriteEffects.None, 0);
+                    _spriteBatch.DrawString(defaultfont, (selection == 1 ? "> " : "") + playerDialogue[((Game1.saveData.Bbg * 2) + 1) + (choicesPulledUp * 10)], new Vector2(1500, 900), Color.Chocolate, 0, new Vector2(50, 0), scale[2], SpriteEffects.None, 0);
             }
             //Dialogue
             _spriteBatch.DrawString(defaultfont, display, new Vector2(textcoords[0], textcoords[1]), Color.Black);

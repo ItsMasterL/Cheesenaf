@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -16,14 +17,22 @@ namespace Cheesenaf
     internal class MainTitle
     {
         private Song titleMusic;
+        private SoundEffect unlock;
         Game1 Game1;
         string[] names;
         Texture2D bg;
         Texture2D title;
+        Texture2D icons;
         float bounceTextScale;
         float titleOffsetY;
         float startScale = 1;
         float startLerp;
+        float unlockAlpha;
+        Color rainbow;
+        Rectangle[] iconSpaces = new Rectangle[5]
+        {
+            new Rectangle(193, 0, 232, 240), new Rectangle(0, 0, 192, 240), new Rectangle(425, 0, 200, 240), new Rectangle(625, 0, 184, 240), new Rectangle(840, 0, 185, 240),
+        };
         int selection()
         {
             if (Game1.MouseX >= 1400 && Game1.MouseX <= 1525)
@@ -183,7 +192,7 @@ namespace Cheesenaf
                 "This text is hard to read if you play the game at the default resolution, but at 1080p it's fine!",
                 "How did this happen :(",
                 "Press 'S' on your keyboard while holding both shift keys to get a new splash text!",
-                "What am I doing down here?\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nWhat am I doing down here?"
+                "What am I doing down here?\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nWhat am I doing down here?"
             };
         int splashid;
         float time;
@@ -194,6 +203,8 @@ namespace Cheesenaf
         {
             bg = Content.Load<Texture2D>("BBGSim/Cherry_Blossom_Tree");
             title = Content.Load<Texture2D>("BBGSim/titlepng");
+            unlock = Content.Load<SoundEffect>("Audio/unlock");
+            icons = Content.Load<Texture2D>("BBGSim/select icons");
         }
 
 
@@ -204,7 +215,7 @@ namespace Cheesenaf
             MediaPlayer.IsRepeating = true;
             MediaPlayer.Play(titleMusic);
             Game1.ClearColor = Color.LightPink;
-            names = new string[4] { "Syowen", "Mocha", "Brett", "Alan" };
+            names = ["Syowen", "Mocha", "Brett", "Alan", "Berry"];
             rng = new Random();
             splashid = rng.Next(0, splashtexts.Length);
             bounceTextScale = 1;
@@ -217,6 +228,7 @@ namespace Cheesenaf
             splashSize[0] = Game1.PixelFont.MeasureString(splashtexts[splashid]).X;
             splashSize[1] = Game1.PixelFont.MeasureString(splashtexts[splashid]).Y;
             Game1.Window.Title = "BBGSim - " + splashtexts[splashid];
+            Game1.Window.AllowAltF4 = false;
         }
 
 
@@ -224,22 +236,22 @@ namespace Cheesenaf
         {
             if (Game1.GetKeyDown(Keys.Q))
             {
-                Game1.saveData.bbg = 0;
+                Game1.saveData.Bbg = 0;
                 Game1.Save(Game1.saveData);
             }
             if (Game1.GetKeyDown(Keys.W))
             {
-                Game1.saveData.bbg = 1;
+                Game1.saveData.Bbg = 1;
                 Game1.Save(Game1.saveData);
             }
             if (Game1.GetKeyDown(Keys.E))
             {
-                Game1.saveData.bbg = 2;
+                Game1.saveData.Bbg = 2;
                 Game1.Save(Game1.saveData);
             }
             if (Game1.GetKeyDown(Keys.R))
             {
-                Game1.saveData.bbg = 3;
+                Game1.saveData.Bbg = 3;
                 Game1.Save(Game1.saveData);
             }
             if (Game1.GetMouseDown() && selection() == 0)
@@ -248,9 +260,6 @@ namespace Cheesenaf
                 Game1.Window.AllowAltF4 = true;
                 Game1.ChangeScene(1);
             }
-            time += Game1.delta;
-            bounceTextScale = (2 + (MathF.Sin(time * 4) / 2)) / (0.004f * splashSize[0]);
-            titleOffsetY = MathF.Sin(time) * 10;
             if (selection() == 0)
             {
                 startLerp += Game1.delta * 3;
@@ -285,6 +294,26 @@ namespace Cheesenaf
                 splashSize[1] = Game1.PixelFont.MeasureString(splashtexts[splashid]).Y;
                 Game1.Window.Title = "BBGSim - " + splashtexts[splashid];
             }
+            if (Game1.keyboardThisFrame.IsKeyDown(Keys.LeftAlt) || Game1.keyboardThisFrame.IsKeyDown(Keys.RightAlt))
+            {
+                if (Game1.GetKeyDown(Keys.F4))
+                {
+                    unlock.Play();
+                    Game1.saveData.UnlockedSecret = true;
+                    Game1.saveData.Bbg = 4;
+                    Game1.Save(Game1.saveData);
+                    unlockAlpha = 5;
+                }
+            }
+
+            //Non inputs
+            time += Game1.delta;
+            bounceTextScale = (2 + (MathF.Sin(time * 4) / 2)) / (0.004f * splashSize[0]);
+            titleOffsetY = MathF.Sin(time) * 10;
+            unlockAlpha -= Game1.delta;
+            unlockAlpha = Math.Clamp(unlockAlpha, 0, 5);
+            rainbow = new Color(MathF.Sin(time * 3), -MathF.Sin((time * 3) + 1), MathF.Cos((time * 3) + 0.5f)) * Math.Clamp(unlockAlpha,0,1);
+
         }
 
         public void Draw(SpriteBatch _spriteBatch, GameTime gameTime, SpriteFont defaultfont, SpriteFont bbgfont, Texture2D debugbox)
@@ -295,9 +324,12 @@ namespace Cheesenaf
                 new Vector2((splashSize[0] / 2) - 1.8f, (splashSize[1] / 2) - 1.8f), bounceTextScale, splashid == 144 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
             _spriteBatch.DrawString(Game1.PixelFont, splashtexts[splashid], new Vector2(splashCoords[0], splashCoords[1]), Color.Yellow, -titleOffsetY / 30,
                 new Vector2(splashSize[0] / 2, splashSize[1] / 2), bounceTextScale, splashid == 144 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
-            _spriteBatch.DrawString(bbgfont, "Pick your bbg: " + names[Game1.saveData.bbg], new Vector2(1100,800), Color.Black);
+            _spriteBatch.DrawString(bbgfont, "Pick your bbg: " + names[Game1.saveData.Bbg], new Vector2(1100,800), Color.Black);
+            _spriteBatch.Draw(icons, new Vector2(1300, 600), iconSpaces[Game1.saveData.Bbg], Color.White);
             _spriteBatch.DrawString(bbgfont, "Start", new Vector2(1460,925), Color.Black, 0, new Vector2(bbgfont.MeasureString("Start").X/2, bbgfont.MeasureString("Start").Y / 2),
                 startScale, SpriteEffects.None, 0);
+            if (unlockAlpha > 0)
+            _spriteBatch.DrawString(Game1.PixelFont, "SECRET CHARACTER UNLOCKED!!!", new Vector2(550, 400), rainbow, 0, new Vector2(0,0), 3f, SpriteEffects.None, 0);
 
             if (Game1.isDebugMode)
             {

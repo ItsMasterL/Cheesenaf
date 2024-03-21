@@ -182,23 +182,23 @@ namespace Cheesenaf
                     }
 
                     if (Keyboard.GetState().IsKeyDown(Keys.S) && Keyboard.GetState().IsKeyDown(Keys.Y) && Keyboard.GetState().IsKeyDown(Keys.O) &&
-                        Keyboard.GetState().IsKeyDown(Keys.W) && Keyboard.GetState().IsKeyDown(Keys.E) && Keyboard.GetState().IsKeyDown(Keys.N) && Game1.saveData.bbg != 1 && Game1.saveData.bbg != 2 && Game1.saveData.bbg != 3)
+                        Keyboard.GetState().IsKeyDown(Keys.W) && Keyboard.GetState().IsKeyDown(Keys.E) && Keyboard.GetState().IsKeyDown(Keys.N) && Game1.saveData.Bbg != 1 && Game1.saveData.Bbg != 2 && Game1.saveData.Bbg != 3)
                     {
                         Game1.ResetData();
                     }
 
                     if (Keyboard.GetState().IsKeyDown(Keys.M) && Keyboard.GetState().IsKeyDown(Keys.O) && Keyboard.GetState().IsKeyDown(Keys.C) &&
-                        Keyboard.GetState().IsKeyDown(Keys.H) && Keyboard.GetState().IsKeyDown(Keys.A) && Game1.saveData.bbg == 1)
+                        Keyboard.GetState().IsKeyDown(Keys.H) && Keyboard.GetState().IsKeyDown(Keys.A) && Game1.saveData.Bbg == 1)
                     {
                         Game1.ResetData();
                     }
                     if (Keyboard.GetState().IsKeyDown(Keys.B) && Keyboard.GetState().IsKeyDown(Keys.R) && Keyboard.GetState().IsKeyDown(Keys.E) &&
-                        Keyboard.GetState().IsKeyDown(Keys.T) && Game1.saveData.bbg == 2)
+                        Keyboard.GetState().IsKeyDown(Keys.T) && Game1.saveData.Bbg == 2)
                     {
                         Game1.ResetData();
                     }
                     if (Keyboard.GetState().IsKeyDown(Keys.S) && Keyboard.GetState().IsKeyDown(Keys.A) && Keyboard.GetState().IsKeyDown(Keys.W) &&
-                        Keyboard.GetState().IsKeyDown(Keys.Y) && Keyboard.GetState().IsKeyDown(Keys.E) && Keyboard.GetState().IsKeyDown(Keys.R) && Game1.saveData.bbg == 3)
+                        Keyboard.GetState().IsKeyDown(Keys.Y) && Keyboard.GetState().IsKeyDown(Keys.E) && Keyboard.GetState().IsKeyDown(Keys.R) && Game1.saveData.Bbg == 3)
                     {
                         Game1.ResetData();
                     }
@@ -394,13 +394,13 @@ namespace Cheesenaf
                         if (Game1.saveData.CustomUnlocked)
                             _spriteBatch.DrawString(defaultfont, "Custom Night", new Vector2(250, 550), Color.White);
 
-                        if (Game1.saveData.bbg != 1 && Game1.saveData.bbg != 2 && Game1.saveData.bbg != 3)
+                        if (Game1.saveData.Bbg != 1 && Game1.saveData.Bbg != 2 && Game1.saveData.Bbg != 3)
                         _spriteBatch.DrawString(defaultfont, "Hold down S, Y, O, W, E, N to Reset Data", new Vector2(250, 950), Color.White);
-                        if (Game1.saveData.bbg == 1)
+                        if (Game1.saveData.Bbg == 1)
                         _spriteBatch.DrawString(defaultfont, "Hold down M, O, C, H, A, to Reset Data", new Vector2(250, 950), Color.White);
-                        if (Game1.saveData.bbg == 2)
+                        if (Game1.saveData.Bbg == 2)
                         _spriteBatch.DrawString(defaultfont, "Hold down B, R, E, T to Reset Data", new Vector2(250, 950), Color.White);
-                        if (Game1.saveData.bbg == 3)
+                        if (Game1.saveData.Bbg == 3)
                         _spriteBatch.DrawString(defaultfont, "Hold down S, A, W, Y, E, R to Reset Data", new Vector2(250, 950), Color.White);
 
                         //Mouse

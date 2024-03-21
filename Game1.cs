@@ -81,14 +81,8 @@ namespace Cheesenaf
             ScreenHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
             Window.AllowUserResizing = true;
             Window.ClientSizeChanged += OnResize;
-            Exiting += Game1_Exiting;
+            Window.AllowAltF4 = true;
         }
-
-        private void Game1_Exiting(object sender, EventArgs e)
-        {
-            
-        }
-
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -134,7 +128,9 @@ namespace Cheesenaf
             if (File.Exists(SAVEPATH))
             {
                 saveData = LoadSave();
-                if (saveData.altTitle)
+                saveData.Bbg = Math.Clamp(saveData.Bbg, 0, 4);
+                saveData.Night = Math.Clamp(saveData.Night, 1, 5);
+                if (saveData.AltTitle)
                 {
                     CurrentScene = 2;
                 }
@@ -355,13 +351,14 @@ namespace Cheesenaf
         {
             saveData = new SaveData()
             {
-                altTitle = false,
+                AltTitle = false,
                 Night = 1,
                 CustomUnlocked = false,
                 SixUnlocked = false,
-                bbg = 0,
+                Bbg = 0,
                 Username = null,
                 FullScreen = true,
+                UnlockedSecret = false,
             };
             Save(saveData);
             ChangeScene(0);

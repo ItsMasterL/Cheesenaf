@@ -1891,7 +1891,7 @@ namespace Cheesenaf
                             }
                             if (night > 1)
                             {
-                                if (Game1.saveData.bbg == 0)
+                                if (Game1.saveData.Bbg == 0)
                                 {
                                     syowen = rng.Next(0, 20) <= (bbgAI / 1.5f) ? true : false;
                                 }
@@ -1899,7 +1899,7 @@ namespace Cheesenaf
                                 {
                                     syowen = rng.Next(0, 20) <= (bbgAI / 2f) ? true : false;
                                 }
-                                if (Game1.saveData.bbg == 1)
+                                if (Game1.saveData.Bbg == 1)
                                 {
                                     mocha = rng.Next(0, 20) <= (bbgAI / 1.5f) ? true : false;
                                 }
@@ -1907,7 +1907,7 @@ namespace Cheesenaf
                                 {
                                     mocha = rng.Next(0, 20) <= (bbgAI / 2f) ? true : false;
                                 }
-                                if (Game1.saveData.bbg == 2)
+                                if (Game1.saveData.Bbg == 2)
                                 {
                                     brett = rng.Next(0, 20) <= (bbgAI / 1.5f) ? true : false;
                                 }
@@ -1915,7 +1915,7 @@ namespace Cheesenaf
                                 {
                                     brett = rng.Next(0, 20) <= (bbgAI / 2f) ? true : false;
                                 }
-                                if (Game1.saveData.bbg == 3)
+                                if (Game1.saveData.Bbg == 3)
                                 {
                                     alan = rng.Next(0, 20) <= (bbgAI / 1.5f) ? true : false;
                                 }
@@ -2004,7 +2004,7 @@ namespace Cheesenaf
                             bbgLookTime += Game1.delta / 5;
                             if (bbgLookTime >= 1f)
                             {
-                                Game1.saveData.altTitle = false;
+                                Game1.saveData.AltTitle = false;
                                 if (Game1.saveData.Night > 5) Game1.saveData.Night = 5;
                                 Game1.Save(Game1.saveData);
                                 Game1.ChangeScene(0); //Change to 1 when bbg dating sim exists
