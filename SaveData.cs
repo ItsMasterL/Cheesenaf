@@ -16,5 +16,6 @@ namespace Cheesenaf
         public string Username { get; set; }
         public bool FullScreen { get; set; }
         public bool UnlockedSecret { get; set; }
+        public bool[] splashesSeen { get; set; } = new bool[200];
     }
 }

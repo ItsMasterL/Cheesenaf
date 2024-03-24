@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,9 @@ namespace Cheesenaf
     {
         private Song titleMusic;
         private SoundEffect unlock;
+        private SoundEffect jumpscare;
+        private SoundEffect select;
+        private SoundEffect wumbo;
         Game1 Game1;
         string[] names;
         Texture2D bg;
@@ -29,6 +33,11 @@ namespace Cheesenaf
         float startLerp;
         float unlockAlpha;
         Color rainbow;
+        float jumpscareCountdown = 1000;
+        int jumpscareIndex = -1;
+        int loadInt;
+        int splashesSeen;
+        Texture2D[] jumpscareframes = new Texture2D[120];
         Rectangle[] iconSpaces = new Rectangle[5]
         {
             new Rectangle(193, 0, 232, 240), new Rectangle(0, 0, 192, 240), new Rectangle(425, 0, 200, 240), new Rectangle(625, 0, 184, 240), new Rectangle(840, 0, 185, 240),
@@ -42,10 +51,24 @@ namespace Cheesenaf
                     return 0;
                 }
             }
+            if (Game1.MouseX >= 1360 && Game1.MouseX <= 1400)
+            {
+                if(Game1.MouseY >= 850 && Game1.MouseY <= 900)
+                {
+                    return 1;
+                }
+            }
+            if (Game1.MouseX >= 1460 && Game1.MouseX <= 1500)
+            {
+                if(Game1.MouseY >= 850 && Game1.MouseY <= 900)
+                {
+                    return 2;
+                }
+            }
             return 999;
         }
-        string[] splashtexts = new string[]
-            {
+        readonly string[] splashtexts =
+            [
                 "Not a dating sim!",
                 "WOOOOOOOOOOOO!",
                 "I gotta go to the bathroom!",
@@ -176,7 +199,7 @@ namespace Cheesenaf
                 "More than {3} splash texts!",
                 "My name is tulin\nTodat is noverber 23rd 2017",
                 "I just won half a car!",
-                "Completing the BBG Simulator gives you the thrilling unlock of credits!",
+                "Completing the game gives you the thrilling unlock of credits!",
                 "Try to speedrun this game, {0}!",
                 "Books are neatly placed on the shelf!",
                 "Books are placed neatly on the shelf!",
@@ -192,8 +215,61 @@ namespace Cheesenaf
                 "This text is hard to read if you play the game at the default resolution, but at 1080p it's fine!",
                 "How did this happen :(",
                 "Press 'S' on your keyboard while holding both shift keys to get a new splash text!",
-                "What am I doing down here?\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nWhat am I doing down here?"
-            };
+                "What am I doing down here?\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nWhat am I doing down here?",
+                "There's a special secret for naming yourself after the main character!",
+                "May or may not have a baseball minigame!",
+                "Walkies!",
+                "He's gonna show up!",
+                "What even is an uncleared level, anyway?",
+                "You are allowed to do that, but you will be banned!",
+                "Ain't you Nathaniel B?",
+                "It's about the Mets, baby, love the Mets!",
+                "I always come back!",
+                "Cool idea!",
+                "Thank you Babe Ruth for inventing Tetris!",
+                "Oh no, the instant ramen's been released!",
+                "Welcome, Welcome new galaxy!",
+                "Are you having fun yet?",
+                "Haha, LOOMBA!",
+                "OURPLE GUY?!",
+                "That's just a theory!",
+                "Lack of romance guarenteed!",
+                "Gay people, tomorrow morning!",
+                "I am a Zora. Have you seen a pretty Zora girl around here?",
+                "Zoo wee mama!",
+                "I've made jokes about being ace a lot\nThankfully I'm not actually an attorney!",
+                "You are valid!",
+                "{4}",
+                "Try W for Wumbo!",
+                "Oh hi Mark!",
+                "I'm holding out for a hero!",
+                "I think you dropped an apple, \"Bubby\"!",
+                "What are you gonna do, stab me?",
+                "They used to walk around during the day!",
+                "Did you ever see Foxy the Pirate? Oh wait, Foxy... Oh yeah, Foxy!",
+                "Gordon doesn't need to hear all this, he's a highly trained professional!",
+                "Drink plenty of water!",
+                "B-b-b-brian, s-s-stop!",
+                "So sing along, it's such a silly song!",
+                "Stand back Ashley, this resident is getting evil!",
+                "What is this, some kind of BBG simulator?",
+                "Im a tire!",
+                "Woauoauoaaauaouoaaauooaah, story of Undertale!",
+                "Nuh uh!",
+                "I seem to have lost my phone!",
+                "Moms are heavy!",
+                "Goodnight gurl, I'll see you tomorrow!",
+                "Was that the bite of '87?!",
+                "5/9ths Already!",
+                "I think we're gonna have to kill this guy, {0}",
+                "It is good day to be not dead!",
+                "I hope Benny the Octopus is okay!",
+                "Hey, man, what's with the funky hairdo?",
+                "Exotic butters!",
+                "It'll make it feel, really authentic I think!",
+                "Personality!?!?!?!?!",
+                "Peter, what are you doing?"
+            ];
         int splashid;
         float time;
         int[] splashCoords = new int[2] { 1500, 250 };
@@ -204,6 +280,9 @@ namespace Cheesenaf
             bg = Content.Load<Texture2D>("BBGSim/Cherry_Blossom_Tree");
             title = Content.Load<Texture2D>("BBGSim/titlepng");
             unlock = Content.Load<SoundEffect>("Audio/unlock");
+            jumpscare = Content.Load<SoundEffect>("Audio/jumpscare2");
+            select = Content.Load<SoundEffect>("BBGSim/bbgtext");
+            wumbo = Content.Load<SoundEffect>("Audio/wumbo");
             icons = Content.Load<Texture2D>("BBGSim/select icons");
         }
 
@@ -218,47 +297,60 @@ namespace Cheesenaf
             names = ["Syowen", "Mocha", "Brett", "Alan", "Berry"];
             rng = new Random();
             splashid = rng.Next(0, splashtexts.Length);
+            Game1.saveData.splashesSeen[splashid] = true;
+            Game1.Save(Game1.saveData);
             bounceTextScale = 1;
             int index = 0;
             foreach (string text in splashtexts)
             {
-                splashtexts[index] = string.Format(text, Game1.saveData.Username == null ? "player" : Game1.saveData.Username, names[rng.Next(0,4)], splashtexts.Length, splashtexts.Length - 1);
+                splashtexts[index] = string.Format(text, Game1.saveData.Username == null ? "player" : Game1.saveData.Username, names[rng.Next(0,4)], splashtexts.Length, splashtexts.Length - 1,MathF.Ceiling(jumpscareCountdown));
                 index++;
             }
             splashSize[0] = Game1.PixelFont.MeasureString(splashtexts[splashid]).X;
             splashSize[1] = Game1.PixelFont.MeasureString(splashtexts[splashid]).Y;
             Game1.Window.Title = "BBGSim - " + splashtexts[splashid];
             Game1.Window.AllowAltF4 = false;
+            splashesSeen = 0;
+            foreach (bool value in Game1.saveData.splashesSeen)
+            {
+                if (value) splashesSeen++;
+            }
         }
 
 
         public void Update(GameTime gameTime)
         {
-            if (Game1.GetKeyDown(Keys.Q))
+            if (loadInt < 120)
             {
-                Game1.saveData.Bbg = 0;
-                Game1.Save(Game1.saveData);
-            }
-            if (Game1.GetKeyDown(Keys.W))
-            {
-                Game1.saveData.Bbg = 1;
-                Game1.Save(Game1.saveData);
-            }
-            if (Game1.GetKeyDown(Keys.E))
-            {
-                Game1.saveData.Bbg = 2;
-                Game1.Save(Game1.saveData);
-            }
-            if (Game1.GetKeyDown(Keys.R))
-            {
-                Game1.saveData.Bbg = 3;
-                Game1.Save(Game1.saveData);
+                jumpscareframes[loadInt] = Game1.Content.Load<Texture2D>("Jumpscares/Title/" + (loadInt + 1).ToString("0000"));
+                loadInt++;
             }
             if (Game1.GetMouseDown() && selection() == 0)
             {
                 Game1.Save(Game1.saveData);
                 Game1.Window.AllowAltF4 = true;
                 Game1.ChangeScene(1);
+            }
+            if (Game1.GetMouseDown() && selection() == 2)
+            {
+                if (Game1.saveData.Bbg < 3)
+                {
+                    Game1.saveData.Bbg++;
+                    select.Play();
+                    Game1.Save(Game1.saveData);
+                }
+                else if (Game1.saveData.Bbg < 4 && Game1.saveData.UnlockedSecret)
+                {
+                    Game1.saveData.Bbg++;
+                    select.Play();
+                    Game1.Save(Game1.saveData);
+                }
+            }
+            if (Game1.GetMouseDown() && selection() == 1 && Game1.saveData.Bbg > 0)
+            {
+                Game1.saveData.Bbg--;
+                select.Play();
+                Game1.Save(Game1.saveData);
             }
             if (selection() == 0)
             {
@@ -276,13 +368,22 @@ namespace Cheesenaf
             if (Game1.GetKeyUp(Keys.S) && Game1.keyboardThisFrame.IsKeyDown(Keys.LeftShift) && Game1.keyboardThisFrame.IsKeyDown(Keys.RightShift))
             {
                 splashid = rng.Next(0, splashtexts.Length);
+                Game1.saveData.splashesSeen[splashid] = true;
+                Game1.Save(Game1.saveData);
                 splashSize[0] = Game1.PixelFont.MeasureString(splashtexts[splashid]).X;
                 splashSize[1] = Game1.PixelFont.MeasureString(splashtexts[splashid]).Y;
                 Game1.Window.Title = "BBGSim - " + splashtexts[splashid];
+                splashesSeen = 0;
+                foreach(bool value in Game1.saveData.splashesSeen)
+                {
+                    if (value) splashesSeen++;
+                }
             }
             if (Game1.GetKeyUp(Keys.Up) && splashid < splashtexts.Length - 1 && Game1.isDebugMode)
             {
                 splashid += 1;
+                Game1.saveData.splashesSeen[splashid] = true;
+                Game1.Save(Game1.saveData);
                 splashSize[0] = Game1.PixelFont.MeasureString(splashtexts[splashid]).X;
                 splashSize[1] = Game1.PixelFont.MeasureString(splashtexts[splashid]).Y;
                 Game1.Window.Title = "BBGSim - " + splashtexts[splashid];
@@ -290,13 +391,15 @@ namespace Cheesenaf
             if (Game1.GetKeyUp(Keys.Down) && splashid > 0 && Game1.isDebugMode)
             {
                 splashid -= 1;
+                Game1.saveData.splashesSeen[splashid] = true;
+                Game1.Save(Game1.saveData);
                 splashSize[0] = Game1.PixelFont.MeasureString(splashtexts[splashid]).X;
                 splashSize[1] = Game1.PixelFont.MeasureString(splashtexts[splashid]).Y;
                 Game1.Window.Title = "BBGSim - " + splashtexts[splashid];
             }
             if (Game1.keyboardThisFrame.IsKeyDown(Keys.LeftAlt) || Game1.keyboardThisFrame.IsKeyDown(Keys.RightAlt))
             {
-                if (Game1.GetKeyDown(Keys.F4))
+                if (Game1.GetKeyDown(Keys.F4) && Game1.saveData.UnlockedSecret == false)
                 {
                     unlock.Play();
                     Game1.saveData.UnlockedSecret = true;
@@ -305,6 +408,11 @@ namespace Cheesenaf
                     unlockAlpha = 5;
                 }
             }
+            
+            if (Game1.GetKeyUp(Keys.W) && splashid == 171)
+            {
+                wumbo.Play();
+            }
 
             //Non inputs
             time += Game1.delta;
@@ -312,7 +420,19 @@ namespace Cheesenaf
             titleOffsetY = MathF.Sin(time) * 10;
             unlockAlpha -= Game1.delta;
             unlockAlpha = Math.Clamp(unlockAlpha, 0, 5);
-            rainbow = new Color(MathF.Sin(time * 3), -MathF.Sin((time * 3) + 1), MathF.Cos((time * 3) + 0.5f)) * Math.Clamp(unlockAlpha,0,1);
+            rainbow = new Color(MathF.Sin(time * 3), -MathF.Sin((time * 3) + 1), MathF.Cos((time * 3) + 0.5f));
+            if (splashid == 170)
+            {
+                jumpscareCountdown -= Game1.delta;
+                if (jumpscareCountdown < 0) jumpscareCountdown = 0;
+                splashtexts[170] = string.Format(splashtexts[170], Game1.saveData.Username == null ? "player" : Game1.saveData.Username, names[rng.Next(0, 4)], splashtexts.Length, splashtexts.Length - 1, jumpscareCountdown);
+                splashSize[0] = Game1.PixelFont.MeasureString(MathF.Ceiling(jumpscareCountdown).ToString()).X;
+                splashSize[1] = Game1.PixelFont.MeasureString(MathF.Ceiling(jumpscareCountdown).ToString()).Y;
+                Game1.Window.Title = "BBGSim - " + MathF.Ceiling(jumpscareCountdown).ToString();
+            }
+            if (jumpscareCountdown <= 0) jumpscareIndex += 1;
+            if (jumpscareIndex == jumpscareframes.Length - 1) jumpscare.Play();
+            jumpscareIndex = Math.Clamp(jumpscareIndex, 0, jumpscareframes.Length - 1);
 
         }
 
@@ -320,20 +440,35 @@ namespace Cheesenaf
         {
             _spriteBatch.Draw(bg,new Vector2(-100,0),new Rectangle(0,0, 3000,1500),Color.White, 0, new Vector2(0,0), 0.72f, SpriteEffects.None, 0);
             _spriteBatch.Draw(title,new Vector2(1275,150 + titleOffsetY),new Rectangle(0,0, 1536,218),Color.White, 0, new Vector2(title.Width/2, title.Height/2), 0.72f, SpriteEffects.None, 0);
-            _spriteBatch.DrawString(Game1.PixelFont, splashtexts[splashid], new Vector2(splashCoords[0], splashCoords[1]), Color.SandyBrown, -titleOffsetY / 30,
+            _spriteBatch.DrawString(Game1.PixelFont, splashid == 170 ? MathF.Ceiling(jumpscareCountdown).ToString() : splashtexts[splashid], new Vector2(splashCoords[0], splashCoords[1]), Color.SandyBrown, -titleOffsetY / 30,
                 new Vector2((splashSize[0] / 2) - 1.8f, (splashSize[1] / 2) - 1.8f), bounceTextScale, splashid == 144 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
-            _spriteBatch.DrawString(Game1.PixelFont, splashtexts[splashid], new Vector2(splashCoords[0], splashCoords[1]), Color.Yellow, -titleOffsetY / 30,
+            _spriteBatch.DrawString(Game1.PixelFont, splashid == 170 ? MathF.Ceiling(jumpscareCountdown).ToString() : splashtexts[splashid], new Vector2(splashCoords[0], splashCoords[1]), Color.Yellow, -titleOffsetY / 30,
                 new Vector2(splashSize[0] / 2, splashSize[1] / 2), bounceTextScale, splashid == 144 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
             _spriteBatch.DrawString(bbgfont, "Pick your bbg: " + names[Game1.saveData.Bbg], new Vector2(1100,800), Color.Black);
-            _spriteBatch.Draw(icons, new Vector2(1300, 600), iconSpaces[Game1.saveData.Bbg], Color.White);
+            _spriteBatch.DrawString(defaultfont, "<-    ->", new Vector2(1360,850), Color.Black);
+            _spriteBatch.DrawString(Game1.PixelFont, "Unique Splashes seen: " + splashesSeen, new Vector2(12,1052), splashesSeen == splashtexts.Length ? Color.DarkCyan : Color.SaddleBrown);
+            _spriteBatch.DrawString(Game1.PixelFont, "Unique Splashes seen: " + splashesSeen, new Vector2(10,1050), splashesSeen == splashtexts.Length ? Color.Cyan : Color.Yellow);
+            if (Game1.saveData.UnlockedSecret && Game1.saveData.SixUnlocked && Game1.saveData.CustomUnlocked && splashesSeen == splashtexts.Length)
+            {
+                _spriteBatch.DrawString(Game1.PixelFont, "Save file at 100%!! Thank you for playing!", new Vector2(12, 1027), new Color(rainbow.R / 2, rainbow.G / 2, rainbow.B / 2));
+                _spriteBatch.DrawString(Game1.PixelFont, "Save file at 100%!! Thank you for playing!", new Vector2(10, 1025), rainbow);
+            }
+            _spriteBatch.Draw(icons, new Vector2(1325, 600), iconSpaces[Game1.saveData.Bbg], Color.White);
             _spriteBatch.DrawString(bbgfont, "Start", new Vector2(1460,925), Color.Black, 0, new Vector2(bbgfont.MeasureString("Start").X/2, bbgfont.MeasureString("Start").Y / 2),
                 startScale, SpriteEffects.None, 0);
             if (unlockAlpha > 0)
-            _spriteBatch.DrawString(Game1.PixelFont, "SECRET CHARACTER UNLOCKED!!!", new Vector2(550, 400), rainbow, 0, new Vector2(0,0), 3f, SpriteEffects.None, 0);
+            _spriteBatch.DrawString(Game1.PixelFont, "SECRET CHARACTER UNLOCKED!!!", new Vector2(550, 400), rainbow * Math.Clamp(unlockAlpha, 0, 1), 0, new Vector2(0,0), 3f, SpriteEffects.None, 0);
 
             if (Game1.isDebugMode)
             {
                 _spriteBatch.Draw(debugbox, new Rectangle(1400, 900,125,50), new Color(139, 51, 255, 20));
+                _spriteBatch.Draw(debugbox, new Rectangle(1360, 850,40,50), new Color(139, 51, 255, 20));
+                _spriteBatch.Draw(debugbox, new Rectangle(1460, 850,40,50), new Color(139, 51, 255, 20));
+            }
+
+            if (jumpscareCountdown <= 0)
+            {
+                _spriteBatch.Draw(jumpscareframes[jumpscareIndex], new Vector2(0, 0), new Rectangle(0,0,1280,720), Color.White,0,new Vector2(0,0),1.5f,SpriteEffects.None,0);
             }
         }
     }

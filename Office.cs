@@ -32,6 +32,7 @@ namespace Cheesenaf
         public int secretcamsx;
         public bool addcamsx;
         public SoundEffect[] sounds;
+        public SoundEffect call;
         public Song[] ambience;
         public bool soundToggle;
         public SoundEffectInstance[] soundchannel;
@@ -102,6 +103,7 @@ namespace Cheesenaf
         public float power = 100;
         public int usage = 1;
         public int night = 1;
+        public float clockAnimOffset = 540;
 
         float freddyPowerTimer;
         int freddyPowerPos;
@@ -113,6 +115,11 @@ namespace Cheesenaf
 
         public int chunkLoad;
         public bool loaded;
+
+        float phoneRingTimer = 3;
+        bool phoneAnswered;
+        bool secondphonebool;
+        float phoneDelay = 1;
 
         Game1 Game1;
         public void LoadContent(ContentManager Content)
@@ -726,7 +733,7 @@ namespace Cheesenaf
                     Buttons = Content.Load<Texture2D>("Office Renders/buttonspoweron");
 
                     //Audio
-                    sounds = new SoundEffect[25];
+                    sounds = new SoundEffect[27];
                     sounds[0] = Content.Load<SoundEffect>("Audio/light");
                     sounds[1] = Content.Load<SoundEffect>("Audio/boop");
                     sounds[2] = Content.Load<SoundEffect>("Audio/rare boop");
@@ -752,6 +759,12 @@ namespace Cheesenaf
                     sounds[22] = Content.Load<SoundEffect>("Audio/knock2");
                     sounds[23] = Content.Load<SoundEffect>("Audio/cheesestick");
                     sounds[24] = Content.Load<SoundEffect>("Audio/bbg");
+                    sounds[25] = Content.Load<SoundEffect>("Audio/ring");
+                    sounds[26] = Content.Load<SoundEffect>("Audio/pickup");
+                    if (night < 6)
+                    {
+                        call = Content.Load<SoundEffect>("Audio/Voices/call " + night.ToString("0"));
+                    }
                     //Channels-
                     //0: Lights, 6 am chime
                     //1: Window Jumpscare, boop, 6 am cheer, cam change
@@ -761,6 +774,7 @@ namespace Cheesenaf
                     //5: Camera glitch
                     //6: Freddy hehehe
                     //7: bbg static
+                    //8: Phone
                     soundchannel = new SoundEffectInstance[10];
                     //Ambience
                     ambience = new Song[2];
@@ -927,6 +941,54 @@ namespace Cheesenaf
             }
             if (time / 70 < 6 && power > 0)
             {
+                //Phone guy
+                if (night < 6)
+                {
+                    if (!phoneAnswered)
+                    {
+                        if (phoneRingTimer > 0)
+                        {
+                            phoneRingTimer -= Game1.delta;
+                        }
+                        else
+                        {
+                            soundchannel[8] = sounds[25].CreateInstance();
+                            soundchannel[8].Play();
+                            phoneRingTimer = 5;
+                        }
+                    }
+                    else if (secondphonebool == false)
+                    {
+                        if (soundchannel[8] != null)
+                        {
+                            if (soundchannel[8].State == SoundState.Playing) soundchannel[8].Stop();
+                        }
+                        soundchannel[8] = sounds[26].CreateInstance();
+                        soundchannel[8].Play();
+                        secondphonebool = true;
+                    }
+                    else
+                    {
+                        phoneDelay -= Game1.delta;
+                    }
+
+                    if (phoneDelay <= 0)
+                    {
+                        soundchannel[8] = call.CreateInstance();
+                        soundchannel[8].Play();
+                        phoneDelay = 9999999;
+                    }
+
+                    if (phoneDelay > 999999 && (Game1.MouseX >= 1522 + officex && Game1.MouseX <= 1650 + officex && Game1.MouseY >= 568 && Game1.MouseY <= 604 && Game1.GetMouseDown()))
+                    {
+                        if (soundchannel[8].State == SoundState.Playing) soundchannel[8].Stop();
+                    }
+
+                    if (time > 14.5f || (Game1.MouseX >= 1522 + officex && Game1.MouseX <= 1650 + officex && Game1.MouseY >= 568 && Game1.MouseY <= 604 && Game1.GetMouseDown())) phoneAnswered = true;
+                }
+
+
+                //Ai level up
                 if (time/70 > 2 && !updateone && CheeseAI == 0)
                 {
                     if (BonnieAI < 20)
@@ -1100,14 +1162,17 @@ namespace Cheesenaf
                 soundchannel[4].Stop();
             }
             
-
+            //6 AM
             if (time / 70 >= 6)
             {
+                clockAnimOffset -= Game1.delta * 10;
+                clockAnimOffset = Math.Clamp(clockAnimOffset, 490, 540);
                 isJumpScare = false;
                 BonnieAI = 0;
                 ChicaAI = 0;
                 FreddyAI = 0;
                 FoxyAI = 0;
+                CheeseAI = 0;
                 MediaPlayer.Stop();
                 if (soundchannel[3] != null)
                     soundchannel[3].Stop(); //stop ambient sound
@@ -1142,6 +1207,8 @@ namespace Cheesenaf
                     {
                         if (night < 5)
                             Game1.passStartNight = true;
+                        if (night == 6)
+                            Game1.passNightSixWin = true;
                         Game1.ChangeScene(2);
                     }
                 }
@@ -2230,6 +2297,7 @@ namespace Cheesenaf
                         _spriteBatch.Draw(debugbox, new Rectangle(1415 + officex, 177, 50, 50), new Color(139, 51, 255, 20));
                         _spriteBatch.Draw(debugbox, new Rectangle(0 + officex, 715, 115, 93), new Color(139, 51, 255, 20));
                         _spriteBatch.Draw(debugbox, new Rectangle(2754 + officex, 715, 115, 93), new Color(139, 51, 255, 20));
+                        _spriteBatch.Draw(debugbox, new Rectangle(1522 + officex, 568, 128, 36), new Color(139, 51, 255, 20));
                     }
                     if (canCam)
                     {
@@ -2255,7 +2323,11 @@ namespace Cheesenaf
             }
             else
             {
-                _spriteBatch.DrawString(defaultfont, "6 AM", new Vector2(960, 540), Color.White);
+                _spriteBatch.DrawString(defaultfont, "5", new Vector2(960, clockAnimOffset), Color.White);
+                _spriteBatch.DrawString(defaultfont, "  AM", new Vector2(960, 540), Color.White);
+                _spriteBatch.DrawString(defaultfont, "6", new Vector2(960, clockAnimOffset + 50), Color.White);
+                _spriteBatch.Draw(debugbox, new Rectangle(900, 490, 100, 50), Color.Black);
+                _spriteBatch.Draw(debugbox, new Rectangle(900, 570, 100, 50), Color.Black);
             }
         }
 

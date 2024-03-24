@@ -38,6 +38,7 @@ namespace Cheesenaf
         public const string SAVEPATH = "data.json";
 
         public bool passJumpscare;
+        public bool passNightSixWin;
         public bool passStartNight;
 
         public int FreddyLevel;
@@ -59,6 +60,8 @@ namespace Cheesenaf
         public int MouseY;
 
         public bool sneakyLoad;
+
+        public bool canEscape = true;
 
         public SpriteFont defaultfont;
         public SpriteFont PixelFont;
@@ -165,7 +168,7 @@ namespace Cheesenaf
             
             if (this.IsActive)
             {
-                if (GetKeyDown(Keys.Escape) && CurrentScene != 3 && CurrentScene != 1)
+                if (GetKeyDown(Keys.Escape) && CurrentScene != 3 && CurrentScene != 1 && canEscape)
                     Exit();
                 if (GetKeyDown(Keys.Tab) && isDebugMode)
                 {
@@ -298,8 +301,10 @@ namespace Cheesenaf
                     cheesenafTitle = new CheesenafTitle();
                     if (passJumpscare) cheesenafTitle.fromJumpscare = true;
                     if (passStartNight) cheesenafTitle.transition = true;
+                    if (passNightSixWin) cheesenafTitle.fromNightSixWin = true;
                     passJumpscare = false;
                     passStartNight = false;
+                    passNightSixWin = false;
                     cheesenafTitle.Initialize(this);
                     cheesenafTitle.LoadContent(Content);
                     break;
@@ -359,6 +364,7 @@ namespace Cheesenaf
                 Username = null,
                 FullScreen = true,
                 UnlockedSecret = false,
+                splashesSeen = new bool[200],
             };
             Save(saveData);
             ChangeScene(0);

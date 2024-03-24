@@ -26,6 +26,8 @@ namespace Cheesenaf
         string display = "";
         string buffer = "";
         string userInput;
+        int delay = 1; //In frames
+        int currentDelay;
 
         int dialoguePart = -1;
 
@@ -45,6 +47,7 @@ namespace Cheesenaf
         int currentSelectionCount;
 
         Texture2D[] bbgs;
+        SoundEffect[] voices;
         int emotion = 1;
         Color[] nametagColor = [new Color(185, 56, 255), new Color(20, 148, 222), new Color(23, 189, 131), new Color(8, 140, 37), new Color(255, 143, 186)];
         Song song;
@@ -57,7 +60,7 @@ namespace Cheesenaf
         SoundEffectInstance boxZooms;
         public void LoadContent(ContentManager Content)
         {
-            bbgs = new Texture2D[5];
+            bbgs = new Texture2D[4];
             if (Game1.saveData.Bbg == 0)
             {
                 bbgs[0] = Content.Load<Texture2D>("BBGSim/syowen");
@@ -92,6 +95,47 @@ namespace Cheesenaf
                 bbgs[1] = Content.Load<Texture2D>("BBGSim/alanhappy");
                 bbgs[2] = Content.Load<Texture2D>("BBGSim/alanneutral");
                 bbgs[3] = Content.Load<Texture2D>("BBGSim/alanunhappy");
+            }
+            voices = new SoundEffect[5];
+            if (Game1.saveData.Bbg == 0)
+            {
+                voices[0] = Content.Load<SoundEffect>("Audio/Voices/sb_a");
+                voices[1] = Content.Load<SoundEffect>("Audio/Voices/sb_i");
+                voices[2] = Content.Load<SoundEffect>("Audio/Voices/sb_u");
+                voices[3] = Content.Load<SoundEffect>("Audio/Voices/sb_e");
+                voices[4] = Content.Load<SoundEffect>("Audio/Voices/sb_o");
+            }
+            if (Game1.saveData.Bbg == 1)
+            {
+                voices[0] = Content.Load<SoundEffect>("Audio/Voices/mm_a");
+                voices[1] = Content.Load<SoundEffect>("Audio/Voices/mm_i");
+                voices[2] = Content.Load<SoundEffect>("Audio/Voices/mm_u");
+                voices[3] = Content.Load<SoundEffect>("Audio/Voices/mm_e");
+                voices[4] = Content.Load<SoundEffect>("Audio/Voices/mm_o");
+            }
+            if (Game1.saveData.Bbg == 2)
+            {
+                voices[0] = Content.Load<SoundEffect>("Audio/Voices/gb_a");
+                voices[1] = Content.Load<SoundEffect>("Audio/Voices/gb_i");
+                voices[2] = Content.Load<SoundEffect>("Audio/Voices/gb_u");
+                voices[3] = Content.Load<SoundEffect>("Audio/Voices/gb_e");
+                voices[4] = Content.Load<SoundEffect>("Audio/Voices/gb_o");
+            }
+            if (Game1.saveData.Bbg == 3)
+            {
+                voices[0] = Content.Load<SoundEffect>("Audio/Voices/gb_a");
+                voices[1] = Content.Load<SoundEffect>("Audio/Voices/gb_i");
+                voices[2] = Content.Load<SoundEffect>("Audio/Voices/gb_u");
+                voices[3] = Content.Load<SoundEffect>("Audio/Voices/gb_e");
+                voices[4] = Content.Load<SoundEffect>("Audio/Voices/gb_o");
+            }
+            if (Game1.saveData.Bbg == 4)
+            {
+                voices[0] = Content.Load<SoundEffect>("Audio/Voices/gb_a");
+                voices[1] = Content.Load<SoundEffect>("Audio/Voices/gb_i");
+                voices[2] = Content.Load<SoundEffect>("Audio/Voices/gb_u");
+                voices[3] = Content.Load<SoundEffect>("Audio/Voices/gb_e");
+                voices[4] = Content.Load<SoundEffect>("Audio/Voices/gb_o");
             }
             sounds = new SoundEffect[6];
             sounds[0] = Content.Load<SoundEffect>("BBGSim/bbgtext");
@@ -258,10 +302,26 @@ namespace Cheesenaf
             {
                 Game1.ChangeScene(0);
             }
-            if (display.Length < buffer.Length)
+            if (currentDelay == 0)
             {
-                display += buffer.ToCharArray()[display.Length];
+                if (display.Length < buffer.Length)
+                {
+                    char character = buffer.ToCharArray()[display.Length];
+                    display += character;
+                    if (Char.ToLower(character) == 'a')
+                        voices[0].Play();
+                    if (Char.ToLower(character) == 'i')
+                        voices[1].Play();
+                    if (Char.ToLower(character) == 'u')
+                        voices[2].Play();
+                    if (Char.ToLower(character) == 'e')
+                        voices[3].Play();
+                    if (Char.ToLower(character) == 'o')
+                        voices[4].Play();
+                }
+                currentDelay = delay;
             }
+            else currentDelay--;
 
             if (scale[0] == 0 && dialoguePart == 8)
             {
@@ -585,7 +645,7 @@ namespace Cheesenaf
             }
             _spriteBatch.Draw(dialogueUI, new Vector2(900, 1000), UIRects[0], Color.White, 0, new Vector2(UIRects[0].Width / 2, UIRects[0].Height / 2), 0.75f * scale[0], SpriteEffects.None, 0);
             _spriteBatch.Draw(dialogueUI, new Vector2(900, 1000), UIRects[1], nametagColor[Game1.saveData.Bbg], -0.35f, new Vector2(1400, 1100), 0.35f * scale[0], SpriteEffects.None, 0);
-                _spriteBatch.DrawString(defaultfont, names[Game1.saveData.Bbg], new Vector2(960, 1000), Color.White, -0.35f, new Vector2(300, 235), 1.65f * scale[0], SpriteEffects.None, 0);
+                _spriteBatch.DrawString(defaultfont, names[Game1.saveData.Bbg], new Vector2(942, 997), Color.White, -0.35f, new Vector2(300, 235), 1.65f * scale[0], SpriteEffects.None, 0);
             //Input
             _spriteBatch.Draw(dialogueUI, new Vector2(900, 100), UIRects[3], Color.White, 0, new Vector2(UIRects[3].Width / 2, UIRects[3].Height / 2), 0.5f * scale[1], SpriteEffects.None, 0);
             if (userInput != null)
