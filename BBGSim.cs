@@ -327,7 +327,6 @@ namespace Cheesenaf
             {
                 Game1.sneakyLoad = true;
                 Game1.saveData.AltTitle = true;
-                Game1.saveData.Night = 1;
                 Game1.Save(Game1.saveData);
                 Game1.ChangeScene(3);
             }

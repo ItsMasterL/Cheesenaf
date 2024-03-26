@@ -250,7 +250,7 @@ namespace Cheesenaf
                 "Gordon doesn't need to hear all this, he's a highly trained professional!",
                 "Drink plenty of water!",
                 "B-b-b-brian, s-s-stop!",
-                "So sing along, it's such a silly song!",
+                "Yes you are no you're not- GO TO JAIL!!!",
                 "Stand back Ashley, this resident is getting evil!",
                 "What is this, some kind of BBG simulator?",
                 "Im a tire!",
@@ -311,9 +311,12 @@ namespace Cheesenaf
             Game1.Window.Title = "BBGSim - " + splashtexts[splashid];
             Game1.Window.AllowAltF4 = false;
             splashesSeen = 0;
+            index = 0;
             foreach (bool value in Game1.saveData.splashesSeen)
             {
                 if (value) splashesSeen++;
+                if (value) Trace.WriteLine(splashtexts[index]);
+                index++;
             }
         }
 

@@ -714,7 +714,6 @@ namespace Cheesenaf
                     camSprites[25] = Content.Load<Texture2D>("Cams/bathrooms bonnie soyjack");
                     camSprites[26] = Content.Load<Texture2D>("Cams/bathrooms feddy");
                     camSprites[27] = null; //Kitchen/Fallback
-                    camSprites[28] = Content.Load<Texture2D>("Cams/cam static");
                     camSprites[29] = Content.Load<Texture2D>("Cams/party room cheesestick");
                     camSprites[30] = Content.Load<Texture2D>("Cams/syowen");
                     camSprites[31] = Content.Load<Texture2D>("Cams/mocha");
@@ -867,42 +866,42 @@ namespace Cheesenaf
                     ChicaAI = 0;
                     FreddyAI = 0;
                     FoxyAI = 0;
-                    bbgAI = 1;
+                    bbgAI = 0;
                     break;
                 case 2:
                     BonnieAI = 3;
                     ChicaAI = 1;
                     FreddyAI = 0;
                     FoxyAI = 1;
-                    bbgAI = 3;
+                    bbgAI = 0;
                     break;
                 case 3:
                     BonnieAI = 0;
                     ChicaAI = 5;
                     FreddyAI = 1;
                     FoxyAI = 2;
-                    bbgAI = 5;
+                    bbgAI = 1;
                     break;
                 case 4:
                     BonnieAI = 2;
                     ChicaAI = 4;
                     FreddyAI = 2;
                     FoxyAI = 6;
-                    bbgAI = 8.5f;
+                    bbgAI = 2;
                     break;
                 case 5:
                     BonnieAI = 5;
                     ChicaAI = 7;
                     FreddyAI = 3;
                     FoxyAI = 5;
-                    bbgAI = 10;
+                    bbgAI = 3;
                     break;
                 case 6:
                     BonnieAI = 10;
                     ChicaAI = 12;
                     FreddyAI = 4;
                     FoxyAI = 16;
-                    bbgAI = 14;
+                    bbgAI = 5;
                     break;
                 case 7:
                     BonnieAI = Game1.BonnieLevel;
@@ -1960,35 +1959,35 @@ namespace Cheesenaf
                             {
                                 if (Game1.saveData.Bbg == 0)
                                 {
-                                    syowen = rng.Next(0, 20) <= (bbgAI / 1.5f) ? true : false;
+                                    syowen = rng.Next(0, 20) <= (bbgAI / 3f) ? true : false;
                                 }
                                 else
                                 {
-                                    syowen = rng.Next(0, 20) <= (bbgAI / 2f) ? true : false;
+                                    syowen = rng.Next(0, 20) <= (bbgAI / 4f) ? true : false;
                                 }
                                 if (Game1.saveData.Bbg == 1)
                                 {
-                                    mocha = rng.Next(0, 20) <= (bbgAI / 1.5f) ? true : false;
+                                    mocha = rng.Next(0, 20) <= (bbgAI / 3f) ? true : false;
                                 }
                                 else
                                 {
-                                    mocha = rng.Next(0, 20) <= (bbgAI / 2f) ? true : false;
+                                    mocha = rng.Next(0, 20) <= (bbgAI / 4f) ? true : false;
                                 }
                                 if (Game1.saveData.Bbg == 2)
                                 {
-                                    brett = rng.Next(0, 20) <= (bbgAI / 1.5f) ? true : false;
+                                    brett = rng.Next(0, 20) <= (bbgAI / 3f) ? true : false;
                                 }
                                 else
                                 {
-                                    brett = rng.Next(0, 20) <= (bbgAI / 2f) ? true : false;
+                                    brett = rng.Next(0, 20) <= (bbgAI / 4f) ? true : false;
                                 }
                                 if (Game1.saveData.Bbg == 3)
                                 {
-                                    alan = rng.Next(0, 20) <= (bbgAI / 1.5f) ? true : false;
+                                    alan = rng.Next(0, 20) <= (bbgAI / 3f) ? true : false;
                                 }
                                 else
                                 {
-                                    alan = rng.Next(0, 20) <= (bbgAI / 2f) ? true : false;
+                                    alan = rng.Next(0, 20) <= (bbgAI / 4f) ? true : false;
                                 }
                             }
                         }
@@ -2178,7 +2177,7 @@ namespace Cheesenaf
                         {
                             _spriteBatch.DrawString(defaultfont, camNames[currentCam], new Vector2(0, 0), Color.White);
                         }
-                        _spriteBatch.Draw(camSprites[28], new Vector2(0, 0), new Rectangle(0, (staticMultiplier * 720) + 4 + (staticMultiplier * 2), 1280, 720), new Color(1, 1, 1, 0.01f), 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
+                        _spriteBatch.Draw(camSprites[37], new Vector2(0, 0), new Rectangle(0, (staticMultiplier * 720) + 4 + (staticMultiplier * 2), 1280, 720), Color.White * 0.25f, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
                         //Map
                         _spriteBatch.Draw(camSprites[34], new Vector2(1500, 550), new Rectangle(0, 0, 128, 149), Color.White, 0, new Vector2(0, 0), 3, SpriteEffects.None, 0);
                         //Stage cam buttons
@@ -2252,7 +2251,7 @@ namespace Cheesenaf
                         _spriteBatch.DrawString(pixelfont, "CAM 12", new Vector2(1790, 980), Color.White); //RBathrooms
                         if (bbgTooLate)
                         {
-                            _spriteBatch.Draw(camSprites[37], new Vector2(0, 0), new Rectangle(0, (staticMultiplier * 720) + 4 + (staticMultiplier * 2), 1280, 720), new Color(1, 1, 1, bbgLookTime), 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
+                            _spriteBatch.Draw(camSprites[37], new Vector2(0, 0), new Rectangle(0, (staticMultiplier * 720) + 4 + (staticMultiplier * 2), 1280, 720), Color.White * bbgLookTime, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
                         }
                     }
 

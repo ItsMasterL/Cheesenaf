@@ -49,16 +49,24 @@ namespace Cheesenaf
         string truncatedName;
         bool breakloop;
 
+        int background;
+        float backgroundcooldown;
+
+        float staticAlpha = 0.25f;
+
 
         public void LoadContent(ContentManager Content)
         {
             titleMusic = Content.Load<Song>("Audio/cheesenaf title");
-            endMusic = Content.Load<Song>("Audio/endingmusic");
-            textures = new Texture2D[4];
+            textures = new Texture2D[9];
             textures[0] = Content.Load<Texture2D>("Jumpscares/static");
-            textures[1] = Content.Load<Texture2D>("Cams/cam static");
             textures[2] = Content.Load<Texture2D>("menus/PizzaPoster");
             textures[3] = Content.Load<Texture2D>("Cams/cambutton off");
+            textures[4] = Content.Load<Texture2D>("Title renders/cheese");
+            textures[5] = Content.Load<Texture2D>("Title renders/freddycheese");
+            textures[6] = Content.Load<Texture2D>("Title renders/bonniecheese");
+            textures[7] = Content.Load<Texture2D>("Title renders/chicacheese");
+            textures[8] = Content.Load<Texture2D>("Title renders/foxycheese");
             if (sounds == null)
             {
                 sounds = new SoundEffect[3];
@@ -98,7 +106,8 @@ namespace Cheesenaf
                         truncatedName += Game1.saveData.Username.ToCharArray()[truncatedName.Length];
                     }
                 }
-                
+
+                endMusic = Game1.Content.Load<Song>("Audio/endingmusic");
                 sounds[0] = Game1.Content.Load<SoundEffect>("menus/nightsixcutscene");
                 soundInstance[0] = sounds[0].CreateInstance();
                 soundInstance[0].Play();
@@ -121,6 +130,15 @@ namespace Cheesenaf
 
         public void Update(GameTime gameTime)
         {
+            if (staticAlpha > 0.25f)
+            {
+                staticAlpha -= Game1.delta;
+            }
+            else
+            {
+                staticAlpha = 0.25f;
+            }
+
             mouseState = Game1.mouseState;
             MouseX = Game1.MouseX;
             MouseY = Game1.MouseY;
@@ -159,6 +177,7 @@ namespace Cheesenaf
             }
             else if (fromJumpscare)
             {
+                staticAlpha = 1;
                 fromJumpscare = false;
                 Game1.canEscape = true;
                 soundInstance[0].Stop();
@@ -196,7 +215,7 @@ namespace Cheesenaf
 
                     if (selection != selectionLastFrame && transition == false)
                     {
-                        if ((!Game1.saveData.SixUnlocked && selection == 2) || (!Game1.saveData.CustomUnlocked && selection == 3) || selection == 999)
+                        if ((!Game1.saveData.SixUnlocked && selection == 2) || (!Game1.saveData.CustomUnlocked && selection == 3) || (!Game1.saveData.CustomUnlocked && selection == 4) || selection == 999)
                         {
                             //Do Nothing
                         }
@@ -479,6 +498,20 @@ namespace Cheesenaf
                     }
                 }
             }
+            Random rng = new Random();
+            if (backgroundcooldown <= 0)
+            {
+                background = 0;
+                if (rng.Next(0, 80) == 0)
+                {
+                    background = rng.Next(1, 5);
+                    backgroundcooldown = rng.Next(5,21) / 100f;
+                }
+            }
+            else
+            {
+                backgroundcooldown -= Game1.delta;
+            }
         }
 
         public void Draw(SpriteBatch _spriteBatch, GameTime gameTime, SpriteFont defaultfont, Texture2D debugbox)
@@ -525,7 +558,9 @@ namespace Cheesenaf
                 }
                 else
                 {
-                    _spriteBatch.Draw(textures[1], new Vector2(0, 0), new Rectangle(0, (staticMultiplier * 720) + 4 + (staticMultiplier * 2), 1280, 720), Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
+                    if (!customScreen && !creditsScreen)
+                        _spriteBatch.Draw(textures[4 + background], new Vector2(0, 0), new Rectangle(0, 0, 1280, 720), Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
+                    _spriteBatch.Draw(textures[0], new Vector2(0, 0), new Rectangle(0, (staticMultiplier * 720) + 4 + (staticMultiplier * 2), 1280, 720), Color.White * staticAlpha, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
                     if (customScreen)
                     {
                         //_spriteBatch.DrawString(defaultfont, MouseX.ToString() + ", " + MouseY.ToString(), new Vector2(0, 0), Color.White);
@@ -568,7 +603,7 @@ namespace Cheesenaf
                             _spriteBatch.DrawString(defaultfont, "Models", new Vector2(300, 50), Color.White);
                             _spriteBatch.DrawString(defaultfont, "Pizzeria Building + most decorations - Master L\nAnimatronics + Desk Fan - FNAF: Help Wanted\nCashier Machine (https://skfb.ly/oGGVT) - YapGamedev\nOffice Phone (https://skfb.ly/oQNxJ) - schmoldt.art\nPropane tank (https://skfb.ly/6WNsB) by TheDevilsEye\n" +
                                 "Portable Generator (https://skfb.ly/oQBZI) - KalelJuarez\nSecurity Guard's legs - FNAF: Security Breach (Vanessa's model but he is not Vanessa)\nSyowen Model - Sawyeehaw\nJinxed Fox model by dont_jinxit on Gumroad, textures modified by Master L\nVaporeon model - Pokemon Mystery Dungeon Rescue Team DX\n" +
-                                "Pork Pie Hat (https://skfb.ly/6TZZn) by The Elliseran Modeller\nSleek Sunglasses - Roblox\nTrash Can - Darksiders 3\nFoxy Plushie (https://skfb.ly/oFBzZ) by No", new Vector2(350, 100), Color.White);
+                                "Pork Pie Hat (https://skfb.ly/6TZZn) by The Elliseran Modeller\nSleek Sunglasses - Roblox\nTrash Can - Darksiders 3\nFoxy Plushie (https://skfb.ly/oFBzZ) by No\nCheese (https://skfb.ly/oCLDS) by Just8", new Vector2(350, 100), Color.White);
                             _spriteBatch.DrawString(defaultfont, "Audio", new Vector2(300, 650), Color.White);
                             _spriteBatch.DrawString(defaultfont, "Most sound effects were pulled from FNAF 1, FNAF 3, 8-Bit RPG Creator, and Pixabay.com\nBody being dragged (https://youtu.be/4UtQav3siLs) by Troy Larson\nBody hitting ground (https://youtu.be/tfR73jIhfqE) by GFX Sounds\nEating sound - Minecraft\nBBGSim Title - \"There is Romance\"" +
                                 "by Kevin Macleod (There is not romance)\nBBGSim Simulator Music - 4PM (Cherry Blossom) Animal Crossing Gamecube\nCheesenaf Title - \"Blue Sizzle\" by Kevin Macleod\nPhone guy - Syowen\nWumbo - Spongebob", new Vector2(350, 700), Color.White);

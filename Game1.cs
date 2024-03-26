@@ -367,7 +367,7 @@ namespace Cheesenaf
                 splashesSeen = new bool[200],
             };
             Save(saveData);
-            ChangeScene(0);
+            if (CurrentScene != 0) ChangeScene(0);
         }
 
     }
