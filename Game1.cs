@@ -166,7 +166,7 @@ namespace Cheesenaf
             MouseX = (int)MathF.Round(mouseState.X * ScaleX);
             MouseY = (int)MathF.Round(mouseState.Y * ScaleY);
             
-            if (this.IsActive)
+            if (this.IsActive || mainTitle.loading || (CurrentScene == 3 && office.loaded == false))
             {
                 if (GetKeyDown(Keys.Escape) && CurrentScene != 3 && CurrentScene != 1 && canEscape)
                     Exit();
@@ -178,10 +178,10 @@ namespace Cheesenaf
                 {
                     ToggleFullscreen();
                 }
-                if (GetKeyDown(Keys.OemTilde)) //DELETE IN FINAL BUILD
-                {
-                    isDebugMode = !isDebugMode;
-                }
+                //if (GetKeyDown(Keys.OemTilde)) //DELETE IN FINAL BUILD
+                //{
+                //    isDebugMode = !isDebugMode;
+                //}
 
                 keyboardLastFrame = keyboardThisFrame;
                 keyboardThisFrame = Keyboard.GetState();

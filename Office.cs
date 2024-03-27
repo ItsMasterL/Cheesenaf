@@ -121,6 +121,8 @@ namespace Cheesenaf
         bool secondphonebool;
         float phoneDelay = 1;
 
+        bool stopSound;
+
         Game1 Game1;
         public void LoadContent(ContentManager Content)
         {
@@ -684,7 +686,7 @@ namespace Cheesenaf
                     break;
                 case 11:
                     //Cameras - Default first
-                    camSprites = new Texture2D[39];
+                    camSprites = new Texture2D[42];
                     camSprites[0] = Content.Load<Texture2D>("Cams/stage");
                     camSprites[1] = Content.Load<Texture2D>("Cams/pirates cove");
                     camSprites[2] = Content.Load<Texture2D>("Cams/food counter");
@@ -725,6 +727,10 @@ namespace Cheesenaf
                     camSprites[36] = Content.Load<Texture2D>("Cams/cambutton on");
                     camSprites[37] = Content.Load<Texture2D>("Jumpscares/static");
                     camSprites[38] = Content.Load<Texture2D>("Cams/Cam bar");
+                    //Oops missed some
+                    camSprites[39] = Content.Load<Texture2D>("Cams/stage no freddy");
+                    camSprites[40] = Content.Load<Texture2D>("Cams/stage bon only");
+                    camSprites[41] = Content.Load<Texture2D>("Cams/stage chica only");
                     break;
                 case 12:
 
@@ -732,7 +738,7 @@ namespace Cheesenaf
                     Buttons = Content.Load<Texture2D>("Office Renders/buttonspoweron");
 
                     //Audio
-                    sounds = new SoundEffect[27];
+                    sounds = new SoundEffect[28];
                     sounds[0] = Content.Load<SoundEffect>("Audio/light");
                     sounds[1] = Content.Load<SoundEffect>("Audio/boop");
                     sounds[2] = Content.Load<SoundEffect>("Audio/rare boop");
@@ -760,6 +766,7 @@ namespace Cheesenaf
                     sounds[24] = Content.Load<SoundEffect>("Audio/bbg");
                     sounds[25] = Content.Load<SoundEffect>("Audio/ring");
                     sounds[26] = Content.Load<SoundEffect>("Audio/pickup");
+                    sounds[27] = Content.Load<SoundEffect>("Audio/OVEN-DRA_7_GEN-HDF18121"); //Kitchen
                     if (night < 6)
                     {
                         call = Content.Load<SoundEffect>("Audio/Voices/call " + night.ToString("0"));
@@ -774,6 +781,7 @@ namespace Cheesenaf
                     //6: Freddy hehehe
                     //7: bbg static
                     //8: Phone
+                    //9: Kitchen
                     soundchannel = new SoundEffectInstance[10];
                     //Ambience
                     ambience = new Song[2];
@@ -781,6 +789,7 @@ namespace Cheesenaf
                     ambience[0] = Content.Load<Song>("Audio/fan");
                     ambience[1] = Content.Load<Song>("Audio/cam ambience");
 
+                    soundchannel[9] = sounds[27].CreateInstance();
                     MediaPlayer.IsRepeating = true;
                     MediaPlayer.Play(ambience[0]);
                     break;
@@ -1173,8 +1182,17 @@ namespace Cheesenaf
                 FoxyAI = 0;
                 CheeseAI = 0;
                 MediaPlayer.Stop();
-                if (soundchannel[3] != null)
-                    soundchannel[3].Stop(); //stop ambient sound
+                if (!stopSound)
+                {
+                    int index = 0;
+                    foreach (SoundEffectInstance sound in soundchannel)
+                    {
+                        if (soundchannel[index] != null)
+                            soundchannel[index].Stop(); //stop ambient sound
+                        index++;
+                    }
+                    stopSound = true;
+                }
                 if (!Victory)
                 {
                     if (night < 5)
@@ -1201,7 +1219,7 @@ namespace Cheesenaf
                 if (victoryCheerTime >= 0)
                 {
                     victoryCheerTime -= Game1.delta;
-                    Trace.WriteLine(victoryCheerTime);
+                    //Trace.WriteLine(victoryCheerTime);
                     if (victoryCheerTime > 1000 && victoryCheerTime < 9995)
                     {
                         if (night < 5)
@@ -1730,7 +1748,7 @@ namespace Cheesenaf
                         //Freddy
                         if (FreddyAI - 1 >= rng.Next(0, 20) || FreddyTrigger)
                         {
-                            if (FreddyPos <= 4 && BonniePos != 0 && ChicaPos !=0)
+                            if (FreddyPos <= 4)
                             {
                                 FreddyPos++;
                                 soundchannel[6] = sounds[16].CreateInstance();
@@ -1838,6 +1856,24 @@ namespace Cheesenaf
 
                     if (Game1.GetMouseUp()) soundToggle = false;
 
+                    if (ChicaPos == 2)
+                    {
+                        if (inCams && currentCam == 6)
+                        {
+                            soundchannel[9].Volume = 0.75f;
+                        }
+                        else
+                        {
+                            soundchannel[9].Volume = 0.05f;
+                        }
+                        if (soundchannel[9].State != SoundState.Playing)
+                            soundchannel[9].Play();
+                    }
+                    else
+                    {
+                        soundchannel[9].Stop();
+                    }
+
                     officex = Math.Clamp(officex, -950, 0);
                     if (addcamsx)
                     {
@@ -1865,7 +1901,13 @@ namespace Cheesenaf
                         camStates[0] = 10;
                     if (BonniePos != 0 && ChicaPos != 0)
                         camStates[0] = 11;
-                    if (FreddyPos != 0)
+                    if (BonniePos == 0 && FreddyPos != 0 && ChicaPos == 0)
+                        camStates[0] = 39;
+                    if (BonniePos == 0 && FreddyPos != 0 && ChicaPos != 0)
+                        camStates[0] = 40;
+                    if (BonniePos != 0 && FreddyPos != 0 && ChicaPos == 0)
+                        camStates[0] = 41;
+                    if (BonniePos != 0 && ChicaPos != 0 && FreddyPos != 0)
                         camStates[0] = 12;
                     //Parts & Service
                     if (BonniePos != 1)
@@ -2156,13 +2198,13 @@ namespace Cheesenaf
                         {
                             if (currentCam == 8 || currentCam == 10 || currentCam == 12)
                             {
-                                _spriteBatch.Draw(camSprites[baseCam[currentCam]], new Vector2(camsx, 0), new Rectangle(0, 0, 2880, 1080), Color.White, 0f, new Vector2(0, 0), new Vector2(1, 1), SpriteEffects.FlipHorizontally, 0);
-                                _spriteBatch.Draw(camSprites[camStates[currentCam]], new Vector2(camsx, 0), new Rectangle(0, 0, 2880, 1080), Color.White, 0f, new Vector2(0, 0), new Vector2(1, 1), SpriteEffects.FlipHorizontally, 0);
+                                _spriteBatch.Draw(camSprites[baseCam[currentCam]], new Vector2(camsx, 0), new Rectangle(0, 0, 1920, 720), Color.White, 0f, new Vector2(0, 0), 1.5f, SpriteEffects.FlipHorizontally, 0);
+                                _spriteBatch.Draw(camSprites[camStates[currentCam]], new Vector2(camsx, 0), new Rectangle(0, 0, 1920, 720), Color.White, 0f, new Vector2(0, 0), 1.5f, SpriteEffects.FlipHorizontally, 0);
                             }
                             else
                             {
-                                _spriteBatch.Draw(camSprites[baseCam[currentCam]], new Vector2(camsx, 0), new Rectangle(0, 0, 2880, 1080), Color.White);
-                                _spriteBatch.Draw(camSprites[camStates[currentCam]], new Vector2(camsx, 0), new Rectangle(0, 0, 2880, 1080), Color.White);
+                                _spriteBatch.Draw(camSprites[baseCam[currentCam]], new Vector2(camsx, 0), new Rectangle(0, 0, 1920, 720), Color.White, 0f, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
+                                _spriteBatch.Draw(camSprites[camStates[currentCam]], new Vector2(camsx, 0), new Rectangle(0, 0, 1920, 720), Color.White, 0f, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
                             }
                         }
                         else

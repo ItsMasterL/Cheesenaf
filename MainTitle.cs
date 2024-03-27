@@ -42,6 +42,7 @@ namespace Cheesenaf
         {
             new Rectangle(193, 0, 232, 240), new Rectangle(0, 0, 192, 240), new Rectangle(425, 0, 200, 240), new Rectangle(625, 0, 184, 240), new Rectangle(840, 0, 185, 240),
         };
+        public bool loading;
         int selection()
         {
             if (Game1.MouseX >= 1400 && Game1.MouseX <= 1525)
@@ -323,11 +324,13 @@ namespace Cheesenaf
 
         public void Update(GameTime gameTime)
         {
-            if (loadInt < 120)
+            if (splashid == 170) loading = true;
+            if (loadInt < 120 && loading)
             {
                 jumpscareframes[loadInt] = Game1.Content.Load<Texture2D>("Jumpscares/Title/" + (loadInt + 1).ToString("0000"));
                 loadInt++;
             }
+            else loading = false;
             if (Game1.GetMouseDown() && selection() == 0)
             {
                 Game1.Save(Game1.saveData);
@@ -399,6 +402,10 @@ namespace Cheesenaf
                 splashSize[0] = Game1.PixelFont.MeasureString(splashtexts[splashid]).X;
                 splashSize[1] = Game1.PixelFont.MeasureString(splashtexts[splashid]).Y;
                 Game1.Window.Title = "BBGSim - " + splashtexts[splashid];
+            }
+            if (Game1.GetKeyUp(Keys.L) && Game1.isDebugMode)
+            {
+                jumpscareCountdown = 5;
             }
             if (Game1.keyboardThisFrame.IsKeyDown(Keys.LeftAlt) || Game1.keyboardThisFrame.IsKeyDown(Keys.RightAlt))
             {

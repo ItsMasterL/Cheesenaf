@@ -47,6 +47,7 @@ namespace Cheesenaf
         int currentSelectionCount;
 
         Texture2D[] bbgs;
+        Texture2D[] bgs;
         SoundEffect[] voices;
         int emotion = 1;
         Color[] nametagColor = [new Color(185, 56, 255), new Color(20, 148, 222), new Color(23, 189, 131), new Color(8, 140, 37), new Color(255, 143, 186)];
@@ -91,10 +92,10 @@ namespace Cheesenaf
             }
             if (Game1.saveData.Bbg == 4)
             {
-                bbgs[0] = Content.Load<Texture2D>("BBGSim/alan");
-                bbgs[1] = Content.Load<Texture2D>("BBGSim/alanhappy");
-                bbgs[2] = Content.Load<Texture2D>("BBGSim/alanneutral");
-                bbgs[3] = Content.Load<Texture2D>("BBGSim/alanunhappy");
+                bbgs[0] = Content.Load<Texture2D>("BBGSim/berry");
+                bbgs[1] = Content.Load<Texture2D>("BBGSim/berryhappy");
+                bbgs[2] = Content.Load<Texture2D>("BBGSim/berryneutral");
+                bbgs[3] = Content.Load<Texture2D>("BBGSim/berryunhappy");
             }
             voices = new SoundEffect[5];
             if (Game1.saveData.Bbg == 0)
@@ -123,19 +124,19 @@ namespace Cheesenaf
             }
             if (Game1.saveData.Bbg == 3)
             {
-                voices[0] = Content.Load<SoundEffect>("Audio/Voices/gb_a");
-                voices[1] = Content.Load<SoundEffect>("Audio/Voices/gb_i");
-                voices[2] = Content.Load<SoundEffect>("Audio/Voices/gb_u");
-                voices[3] = Content.Load<SoundEffect>("Audio/Voices/gb_e");
-                voices[4] = Content.Load<SoundEffect>("Audio/Voices/gb_o");
+                voices[0] = Content.Load<SoundEffect>("Audio/Voices/sawyer-01");
+                voices[1] = Content.Load<SoundEffect>("Audio/Voices/sawyer-02");
+                voices[2] = Content.Load<SoundEffect>("Audio/Voices/sawyer-03");
+                voices[3] = Content.Load<SoundEffect>("Audio/Voices/sawyer-04");
+                voices[4] = Content.Load<SoundEffect>("Audio/Voices/sawyer-05");
             }
             if (Game1.saveData.Bbg == 4)
             {
-                voices[0] = Content.Load<SoundEffect>("Audio/Voices/gb_a");
-                voices[1] = Content.Load<SoundEffect>("Audio/Voices/gb_i");
-                voices[2] = Content.Load<SoundEffect>("Audio/Voices/gb_u");
-                voices[3] = Content.Load<SoundEffect>("Audio/Voices/gb_e");
-                voices[4] = Content.Load<SoundEffect>("Audio/Voices/gb_o");
+                voices[0] = Content.Load<SoundEffect>("Audio/Voices/sawyer-01");
+                voices[1] = Content.Load<SoundEffect>("Audio/Voices/sawyer-02");
+                voices[2] = Content.Load<SoundEffect>("Audio/Voices/sawyer-03");
+                voices[3] = Content.Load<SoundEffect>("Audio/Voices/sawyer-04");
+                voices[4] = Content.Load<SoundEffect>("Audio/Voices/sawyer-05");
             }
             sounds = new SoundEffect[6];
             sounds[0] = Content.Load<SoundEffect>("BBGSim/bbgtext");
@@ -147,6 +148,7 @@ namespace Cheesenaf
             soundInstance = sounds[0].CreateInstance();
             boxZooms = sounds[0].CreateInstance();
             dialogueUI = Content.Load<Texture2D>("BBGSim/bbgdialogue");
+            bgs = new Texture2D[2] { Content.Load<Texture2D>("BBGSim/Cherry_Blossom_Tree"), Content.Load<Texture2D>("BBGSim/Lanterns") };
             UIRects[0] = new Rectangle(0,0,1592,604); //Textbox
             UIRects[1] = new Rectangle(107,671,824,300); //Nametag
             UIRects[2] = new Rectangle(1047,637,543,524); //Choicesbox
@@ -185,7 +187,7 @@ namespace Cheesenaf
             alanDialogue = new string[dialogueCount]
             {
                 "Hey there! What's your name?", "Nice to meet you, {0}, I'm Alan!", "Hey theres a star festival thing tonight, you should be there tonight", "Alright, sounds good!",
-                "Oh hey, you're here!", "Awesome, thanks!", "Ohhh. Pizza...", "Yeeeaaah, no I dont have good memories of Pizza.", "Yyyyyeahh.", "Oh. okay bye", "Welcome back, {0}..."
+                "Oh hey, you're here!", "Awesome, thanks!", "Ohhh. Pizza...", "Yeeeaaah, no I dont have good memories with pizza.", "Yyyyyeahh.", "Oh. okay bye", "Welcome back, {0}..."
             };
             berryDialogue = new string[dialogueCount]
             {
@@ -637,6 +639,14 @@ namespace Cheesenaf
 
         public void Draw(SpriteBatch _spriteBatch, GameTime gameTime, SpriteFont defaultfont, Texture2D debugbox)
         {
+            if (Game1.ClearColor == Color.Navy)
+            {
+                _spriteBatch.Draw(bgs[1], new Vector2(-100, 0), new Rectangle(0, 0, 3000, 1500), Color.White, 0, new Vector2(0, 0), 0.72f, SpriteEffects.None, 0);
+            }
+            else
+            {
+                _spriteBatch.Draw(bgs[0], new Vector2(-100, 0), new Rectangle(0, 0, 3000, 1500), Color.White, 0, new Vector2(0, 0), 0.72f, SpriteEffects.FlipHorizontally, 0);
+            }
             if (bbgs[0] != null)
             {
                 _spriteBatch.Draw(bbgs[0], new Vector2(400, 50), new Rectangle(0, 0, 1600, 1600), Color.White, 0, new Vector2(0, 0), 0.65f, SpriteEffects.None, 0);
