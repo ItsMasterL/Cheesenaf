@@ -3,15 +3,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Audio;
-using System.Reflection.Metadata;
-using System.Diagnostics;
 using Microsoft.Xna.Framework.Input;
-using System.Threading;
 
 namespace Cheesenaf
 {
@@ -111,10 +104,11 @@ namespace Cheesenaf
                 sounds[0] = Game1.Content.Load<SoundEffect>("menus/nightsixcutscene");
                 soundInstance[0] = sounds[0].CreateInstance();
                 soundInstance[0].Play();
-                endScreens = new Texture2D[3];
+                endScreens = new Texture2D[4];
                 endScreens[0] = Game1.Content.Load<Texture2D>("menus/scratchout");
                 endScreens[1] = Game1.Content.Load<Texture2D>("menus/canon");
                 endScreens[2] = Game1.Content.Load<Texture2D>("menus/pizzatrapped");
+                endScreens[3] = Game1.Content.Load<Texture2D>("menus/scribble");
                 staticTime = 60;
                 Game1.canEscape = false;
             }
@@ -548,6 +542,7 @@ namespace Cheesenaf
                         {
                             _spriteBatch.Draw(endScreens[0], new Vector2(0, 0), Color.White * cutsceneAlpha);
                             _spriteBatch.DrawString(Game1.BBGFont, truncatedName, new Vector2(1598, 498), Color.Lerp(Color.Black, new Color(34,34,34),cutsceneAlpha), -0.2f, new Vector2(0, 0), 0.75f, SpriteEffects.None, 0);
+                            _spriteBatch.Draw(endScreens[3], new Vector2(1598, 498), new Rectangle(0,0,227,107), Color.Lerp(Color.Black, new Color(34,34,34),cutsceneAlpha), -0.2f, new Vector2(0, 0), 0.38f, SpriteEffects.None, 0);
                         }
                     }
                     if (staticTime <= 20)

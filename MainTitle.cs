@@ -5,13 +5,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Cheesenaf
 {
@@ -316,7 +309,7 @@ namespace Cheesenaf
             foreach (bool value in Game1.saveData.splashesSeen)
             {
                 if (value) splashesSeen++;
-                if (value) Trace.WriteLine(splashtexts[index]);
+                //if (value) Trace.WriteLine(splashtexts[index]);
                 index++;
             }
         }

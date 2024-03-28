@@ -5,13 +5,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Cheesenaf
 {
@@ -918,7 +911,7 @@ namespace Cheesenaf
                     FreddyAI = Game1.FreddyLevel;
                     FoxyAI = Game1.FoxyLevel;
                     bbgAI = (BonnieAI + ChicaAI + FreddyAI + FoxyAI) / 4f;
-                    Trace.WriteLine(bbgAI);
+                    //Trace.WriteLine(bbgAI);
                     if (FreddyAI == 1 && BonnieAI == 7 && ChicaAI == 9 && FoxyAI == 2)
                     {
                         FreddyAI = 0;

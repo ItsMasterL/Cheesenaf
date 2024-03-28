@@ -1,15 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net.NetworkInformation;
 using System.Text.Json;
-using System.Threading;
 
 namespace Cheesenaf
 {
@@ -115,8 +110,8 @@ namespace Cheesenaf
         {
             OnResize();
             // TODO: Add your initialization logic here
-            Trace.WriteLine(ScreenWidth + ", " + ScreenHeight);
-            Trace.WriteLine(ScaleX + ", " + ScaleY);
+            //Trace.WriteLine(ScreenWidth + ", " + ScreenHeight);
+            //Trace.WriteLine(ScaleX + ", " + ScaleY);
             defaultfont = Content.Load<SpriteFont>("File");
             PixelFont = Content.Load<SpriteFont>("Mojangles");
             BBGFont = Content.Load<SpriteFont>("Fennario");
@@ -178,10 +173,10 @@ namespace Cheesenaf
                 {
                     ToggleFullscreen();
                 }
-                //if (GetKeyDown(Keys.OemTilde)) //DELETE IN FINAL BUILD
-                //{
-                //    isDebugMode = !isDebugMode;
-                //}
+                if (GetKeyDown(Keys.OemTilde)) //DELETE IN FINAL BUILD
+                {
+                    isDebugMode = !isDebugMode;
+                }
 
                 keyboardLastFrame = keyboardThisFrame;
                 keyboardThisFrame = Keyboard.GetState();
@@ -341,7 +336,7 @@ namespace Cheesenaf
         public SaveData LoadSave()
         {
             var fileContents = File.ReadAllText(SAVEPATH);
-            Trace.WriteLine("Loaded: " + fileContents);
+            //Trace.WriteLine("Loaded: " + fileContents);
             return JsonSerializer.Deserialize<SaveData>(fileContents);
         }
 
@@ -349,7 +344,7 @@ namespace Cheesenaf
         {
             string serializedText = JsonSerializer.Serialize<SaveData>(data);
             File.WriteAllText(SAVEPATH, serializedText);
-            Trace.WriteLine("Saved: " + serializedText);
+            //Trace.WriteLine("Saved: " + serializedText);
         }
 
         public void ResetData()
