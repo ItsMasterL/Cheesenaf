@@ -173,10 +173,10 @@ namespace Cheesenaf
                 {
                     ToggleFullscreen();
                 }
-                if (GetKeyDown(Keys.OemTilde)) //DELETE IN FINAL BUILD
-                {
-                    isDebugMode = !isDebugMode;
-                }
+                //if (GetKeyDown(Keys.OemTilde)) //DELETE IN FINAL BUILD
+                //{
+                //    isDebugMode = !isDebugMode;
+                //}
 
                 keyboardLastFrame = keyboardThisFrame;
                 keyboardThisFrame = Keyboard.GetState();
