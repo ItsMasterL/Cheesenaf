@@ -556,7 +556,7 @@ namespace Cheesenaf
                     if (!customScreen && !creditsScreen)
                     {
                         _spriteBatch.Draw(textures[4 + background], new Vector2(0, 0), new Rectangle(0, 0, 1280, 720), Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
-                        _spriteBatch.DrawString(defaultfont, "Version 1.0.0", new Vector2(10, 1040),Color.White);
+                        _spriteBatch.DrawString(defaultfont, "Version 1.0.1", new Vector2(10, 1040),Color.White);
                     }
                     _spriteBatch.Draw(textures[0], new Vector2(0, 0), new Rectangle(0, (staticMultiplier * 720) + 4 + (staticMultiplier * 2), 1280, 720), Color.White * staticAlpha, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
                     if (customScreen)

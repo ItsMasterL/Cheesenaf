@@ -772,7 +772,7 @@ namespace Cheesenaf
                     //4: Footsteps, foxy banging, freddy chimes
                     //5: Camera glitch
                     //6: Freddy hehehe
-                    //7: bbg static
+                    //7: bbg static, hang up phone
                     //8: Phone
                     //9: Kitchen
                     soundchannel = new SoundEffectInstance[10];
@@ -982,7 +982,12 @@ namespace Cheesenaf
 
                     if (phoneDelay > 999999 && (Game1.MouseX >= 1522 + officex && Game1.MouseX <= 1650 + officex && Game1.MouseY >= 568 && Game1.MouseY <= 604 && Game1.GetMouseDown()))
                     {
-                        if (soundchannel[8].State == SoundState.Playing) soundchannel[8].Stop();
+                        if (soundchannel[8].State == SoundState.Playing)
+                        {
+                            soundchannel[8].Stop();
+                            soundchannel[7] = sounds[26].CreateInstance();
+                            soundchannel[7].Play();
+                        }
                     }
 
                     if (time > 14.5f || (Game1.MouseX >= 1522 + officex && Game1.MouseX <= 1650 + officex && Game1.MouseY >= 568 && Game1.MouseY <= 604 && Game1.GetMouseDown())) phoneAnswered = true;
@@ -1022,6 +1027,7 @@ namespace Cheesenaf
                         FreddyPos = 0;
                         bonnieAtDoor = false;
                         chicaAtDoor = false;
+                        FreddyTrigger = false;
                         CheeseAI = 18;
                     }
                     else
@@ -1417,6 +1423,7 @@ namespace Cheesenaf
                             if (!leftLight && !rightLight && !centerLight)
                             {
                                 if (soundchannel[0] != null) soundchannel[0].Stop();
+                                soundToggle = false;
                             }
                             else
                             {
@@ -1424,25 +1431,23 @@ namespace Cheesenaf
                                 {
                                     soundToggle = true;
                                     soundchannel[0] = sounds[0].CreateInstance();
+                                    soundchannel[0].IsLooped = true;
                                     soundchannel[0].Play();
                                 }
                             }
                             //Boop
-                            if (MouseX >= 1820 + officex && MouseX <= 1835 + officex && MouseY >= 515 && MouseY <= 525 && mouseState.LeftButton == ButtonState.Pressed)
+                            if (MouseX >= 1820 + officex && MouseX <= 1835 + officex && MouseY >= 515 && MouseY <= 525 && Game1.GetMouseDown())
                             {
-                                if (soundToggle == false)
+                                if (rng.Next(0, 50) == 1)
                                 {
-                                    soundToggle = true;
-                                    if (rng.Next(0, 50) == 1)
-                                    {
-                                        soundchannel[1] = sounds[2].CreateInstance();
-                                    }
-                                    else
-                                    {
-                                        soundchannel[1] = sounds[1].CreateInstance();
-                                    }
-                                    soundchannel[1].Play();
+                                    soundchannel[1] = sounds[2].CreateInstance();
                                 }
+                                else
+                                {
+                                    soundchannel[1] = sounds[1].CreateInstance();
+                                }
+                                soundchannel[1].Play();
+
                             }
 
                             //Left door
@@ -1670,6 +1675,15 @@ namespace Cheesenaf
                             else if (BonniePos == 4)
                             {
                                 bonnieAtDoor = true;
+                                if (leftLight)
+                                {
+                                    if (seenBonnie == false)
+                                    {
+                                        soundchannel[1] = sounds[3].CreateInstance();
+                                        soundchannel[1].Play();
+                                        seenBonnie = true;
+                                    }
+                                }
                                 BonniePos++;
                                 soundchannel[4] = sounds[8].CreateInstance();
                                 soundchannel[4].Volume = 0.5f;
@@ -1716,6 +1730,15 @@ namespace Cheesenaf
                             else if (ChicaPos == 3)
                             {
                                 chicaAtDoor = true;
+                                if (rightLight)
+                                {
+                                    if (seenChica == false)
+                                    {
+                                        soundchannel[1] = sounds[3].CreateInstance();
+                                        soundchannel[1].Play();
+                                        seenChica = true;
+                                    }
+                                }
                                 ChicaPos++;
                                 soundchannel[4] = sounds[8].CreateInstance();
                                 soundchannel[4].Volume = 0.5f;
@@ -2316,7 +2339,7 @@ namespace Cheesenaf
                 {
                     _spriteBatch.DrawString(pixelfont, MouseX.ToString() + ", " + MouseY.ToString() + " || " + mouseState.X.ToString() + ", " + mouseState.Y.ToString(), new Vector2(0, 50), Color.White);
                     _spriteBatch.DrawString(pixelfont, officex.ToString() + " || " + camsx.ToString() + " || " + secretcamsx.ToString(), new Vector2(0, 100), Color.White);
-                    _spriteBatch.DrawString(pixelfont, multiplier.ToString() + "||" + nextMultiplier.ToString(), new Vector2(0, 150), Color.White);
+                    _spriteBatch.DrawString(pixelfont, multiplier.ToString() + "||" + nextMultiplier.ToString() + "||" + soundToggle.ToString(), new Vector2(0, 150), Color.White);
                     _spriteBatch.DrawString(pixelfont, transition.ToString(), new Vector2(0, 200), Color.White);
                     _spriteBatch.DrawString(pixelfont, "[" + AnimatronicTimer.ToString() + "] Bonnie: " + BonnieAI.ToString() + ":" + BonniePos.ToString() + ", Chica: " + ChicaAI.ToString() + ":" + ChicaPos.ToString() + ", Freddy: " + FreddyAI.ToString() + ":" + FreddyPos.ToString() + " (" + FreddyTrigger.ToString() + "), Foxy: " + FoxyAI.ToString() + ":" + FoxyPos.ToString(), new Vector2(0, 250), Color.White);
                     _spriteBatch.DrawString(pixelfont, MathF.Floor(time / 60).ToString() + ":" + (time % 60).ToString("00.00"), new Vector2(0, 300), Color.White);
