@@ -50,6 +50,8 @@ namespace Cheesenaf
         Song song;
 
         Texture2D dialogueUI;
+        Texture2D enterSign;
+        float enterAlpha;
         Rectangle[] UIRects = new Rectangle[4];
 
         SoundEffect[] sounds;
@@ -144,6 +146,7 @@ namespace Cheesenaf
             soundInstance = sounds[0].CreateInstance();
             boxZooms = sounds[0].CreateInstance();
             dialogueUI = Content.Load<Texture2D>("BBGSim/bbgdialogue");
+            enterSign = Content.Load<Texture2D>("BBGSim/entersymbol");
             bgs = new Texture2D[2] { Content.Load<Texture2D>("BBGSim/Cherry_Blossom_Tree"), Content.Load<Texture2D>("BBGSim/Lanterns") };
             UIRects[0] = new Rectangle(0,0,1592,604); //Textbox
             UIRects[1] = new Rectangle(107,671,824,300); //Nametag
@@ -374,8 +377,14 @@ namespace Cheesenaf
                 }
             }
 
+            if (display.Length == buffer.Length)
+            {
+                enterAlpha += Game1.delta;
+            }
+
             if (Game1.GetKeyDown(Keys.Enter) && display.Length == buffer.Length)
             {
+                enterAlpha = 0;
                 switch (dialoguePart)
                 {
                     case -1:
@@ -653,6 +662,7 @@ namespace Cheesenaf
                 _spriteBatch.DrawString(defaultfont, names[Game1.saveData.Bbg], new Vector2(942, 997), Color.White, -0.35f, new Vector2(300, 235), 1.65f * scale[0], SpriteEffects.None, 0);
             //Input
             _spriteBatch.Draw(dialogueUI, new Vector2(900, 100), UIRects[3], Color.White, 0, new Vector2(UIRects[3].Width / 2, UIRects[3].Height / 2), 0.5f * scale[1], SpriteEffects.None, 0);
+            _spriteBatch.DrawString(defaultfont, "Enter your name:", new Vector2(900, 100), Color.Black, 0, new Vector2(550, 70), scale[1] / 1.75f, SpriteEffects.None, 0);
             if (userInput != null)
                 _spriteBatch.DrawString(defaultfont, userInput, new Vector2(900, 100), Color.Black, 0, new Vector2(310, 20), scale[1], SpriteEffects.None, 0);
             //Choices
@@ -665,6 +675,7 @@ namespace Cheesenaf
             }
             //Dialogue
             _spriteBatch.DrawString(defaultfont, display, new Vector2(textcoords[0], textcoords[1]), Color.Black);
+            _spriteBatch.Draw(enterSign, new Vector2(1400, 1020), nametagColor[Game1.saveData.Bbg] * Math.Abs((float)Math.Sin(enterAlpha)));
         }
     }
 }
