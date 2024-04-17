@@ -127,6 +127,12 @@
 /processorParam:Quality=Best
 /build:Audio/light.wav
 
+#begin Audio/modmusic.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Audio/modmusic.ogg
+
 #begin Audio/music box.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor

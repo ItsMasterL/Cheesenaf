@@ -124,6 +124,10 @@ namespace Cheesenaf
 
         public void Update(GameTime gameTime)
         {
+            if (Game1.GetKeyDown(Keys.F12))
+            {
+                Game1.ChangeScene(4);
+            }
             if (staticAlpha > 0.25f)
             {
                 staticAlpha -= Game1.delta;
@@ -202,6 +206,10 @@ namespace Cheesenaf
                     {
                         selection = (int)Math.Floor((MouseY - 390f) / 50f);
                     }
+                    else if (MouseY >= 890 && MouseY < 940)
+                    {
+                        selection = 5;
+                    }
                     else
                     {
                         selection = 999;
@@ -270,6 +278,15 @@ namespace Cheesenaf
                             soundInstance[1].Stop();
                             soundInstance[1].Play();
                         }
+                    }
+                    if (selection == 5 && Game1.GetMouseDown())
+                    {
+                        if (soundInstance[1] != null)
+                        {
+                            soundInstance[1].Stop();
+                            soundInstance[1].Play();
+                        }
+                        Game1.OpenURL("https://discord.com/invite/yKA3MSvvA5");
                     }
 
                     if (Keyboard.GetState().IsKeyDown(Keys.S) && Keyboard.GetState().IsKeyDown(Keys.Y) && Keyboard.GetState().IsKeyDown(Keys.O) &&
@@ -556,7 +573,7 @@ namespace Cheesenaf
                     if (!customScreen && !creditsScreen)
                     {
                         _spriteBatch.Draw(textures[4 + background], new Vector2(0, 0), new Rectangle(0, 0, 1280, 720), Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
-                        _spriteBatch.DrawString(defaultfont, "Version 1.0.1", new Vector2(10, 1040),Color.White);
+                        _spriteBatch.DrawString(defaultfont, "Version " + Game1.Version, new Vector2(10, 1040),Color.White);
                     }
                     _spriteBatch.Draw(textures[0], new Vector2(0, 0), new Rectangle(0, (staticMultiplier * 720) + 4 + (staticMultiplier * 2), 1280, 720), Color.White * staticAlpha, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
                     if (customScreen)
@@ -632,6 +649,7 @@ namespace Cheesenaf
                             _spriteBatch.DrawString(defaultfont, "Custom Night", new Vector2(250, 550), Color.White);
                         if (Game1.saveData.CustomUnlocked)
                             _spriteBatch.DrawString(defaultfont, "Credits", new Vector2(250, 600), Color.White);
+                        _spriteBatch.DrawString(defaultfont, "Join the Discord server", new Vector2(250, 900), new Color(88,101,242));
 
                         if (Game1.saveData.Bbg != 1 && Game1.saveData.Bbg != 2 && Game1.saveData.Bbg != 3)
                         _spriteBatch.DrawString(defaultfont, "Hold down S, Y, O, W, E, N to Reset Data", new Vector2(250, 950), Color.White);
@@ -650,6 +668,7 @@ namespace Cheesenaf
                         if (selection == 2 && Game1.saveData.SixUnlocked) _spriteBatch.DrawString(defaultfont, ">", new Vector2(200, 500), Color.White);
                         if (selection == 3 && Game1.saveData.CustomUnlocked) _spriteBatch.DrawString(defaultfont, ">", new Vector2(200, 550), Color.White);
                         if (selection == 4 && Game1.saveData.CustomUnlocked) _spriteBatch.DrawString(defaultfont, ">", new Vector2(200, 600), Color.White);
+                        if (selection == 5) _spriteBatch.DrawString(defaultfont, ">", new Vector2(200, 900), Color.White);
                     }
                 }
             }

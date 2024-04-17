@@ -11,5 +11,8 @@
         public bool FullScreen { get; set; }
         public bool UnlockedSecret { get; set; }
         public bool[] splashesSeen { get; set; } = new bool[200];
+        public bool SkipModMenu {  get; set; }
+        public bool EnableDebugTogglewithTildeKey { get; set; }
+        public string[] enabledMods { get; set; }
     }
 }

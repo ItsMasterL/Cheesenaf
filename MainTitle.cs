@@ -30,6 +30,8 @@ namespace Cheesenaf
         int jumpscareIndex = -1;
         int loadInt;
         int splashesSeen;
+        bool reverseText;
+        string splash;
         Texture2D[] jumpscareframes = new Texture2D[120];
         Rectangle[] iconSpaces = new Rectangle[5]
         {
@@ -61,7 +63,7 @@ namespace Cheesenaf
             }
             return 999;
         }
-        readonly string[] splashtexts =
+        private string[] splashtexts =
             [
                 "Not a dating sim!",
                 "WOOOOOOOOOOOO!",
@@ -207,7 +209,7 @@ namespace Cheesenaf
                 "This message is slightly more likely than the others for some reason!",
                 "AAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAA",
                 "This text is hard to read if you play the game at the default resolution, but at 1080p it's fine!",
-                "How did this happen :(",
+                "§RHow did this happen :(",
                 "Press 'S' on your keyboard while holding both shift keys to get a new splash text!",
                 "What am I doing down here?\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nWhat am I doing down here?",
                 "There's a special secret for naming yourself after the main character!",
@@ -233,8 +235,8 @@ namespace Cheesenaf
                 "Zoo wee mama!",
                 "I've made jokes about being ace a lot\nThankfully I'm not actually an attorney!",
                 "You are valid!",
-                "{4}",
-                "Try W for Wumbo!",
+                "§C",
+                "§WTry W for Wumbo!",
                 "Oh hi Mark!",
                 "I'm holding out for a hero!",
                 "I think you dropped an apple, \"Bubby\"!",
@@ -297,12 +299,18 @@ namespace Cheesenaf
             int index = 0;
             foreach (string text in splashtexts)
             {
-                splashtexts[index] = string.Format(text, Game1.saveData.Username == null ? "player" : Game1.saveData.Username, names[rng.Next(0,4)], splashtexts.Length, splashtexts.Length - 1,MathF.Ceiling(jumpscareCountdown));
+                splashtexts[index] = string.Format(text, Game1.saveData.Username == null ? "player" : Game1.saveData.Username, names[rng.Next(0,4)], splashtexts.Length, splashtexts.Length - 1);
                 index++;
             }
-            splashSize[0] = Game1.PixelFont.MeasureString(splashtexts[splashid]).X;
-            splashSize[1] = Game1.PixelFont.MeasureString(splashtexts[splashid]).Y;
-            Game1.Window.Title = "BBGSim - " + splashtexts[splashid];
+            reverseText = false;
+            if (splashtexts[splashid].Contains("§R"))
+            {
+                reverseText = true;
+            }
+            splash = splashtexts[splashid].Replace("§R", string.Empty).Replace("§C", MathF.Ceiling(jumpscareCountdown).ToString()).Replace("§W", string.Empty);
+            splashSize[0] = Game1.PixelFont.MeasureString(splash).X;
+            splashSize[1] = Game1.PixelFont.MeasureString(splash).Y;
+            Game1.Window.Title = "BBGSim - " + splash;
             Game1.Window.AllowAltF4 = false;
             splashesSeen = 0;
             index = 0;
@@ -314,10 +322,13 @@ namespace Cheesenaf
             }
         }
 
-
         public void Update(GameTime gameTime)
         {
-            if (splashid == 170) loading = true;
+            if (Game1.GetKeyDown(Keys.F12))
+            {
+                Game1.ChangeScene(4);
+            }
+            if (splashtexts[splashid].Contains("§C")) loading = true;
             if (loadInt < 120 && loading)
             {
                 jumpscareframes[loadInt] = Game1.Content.Load<Texture2D>("Jumpscares/Title/" + (loadInt + 1).ToString("0000"));
@@ -369,9 +380,15 @@ namespace Cheesenaf
                 splashid = rng.Next(0, splashtexts.Length);
                 Game1.saveData.splashesSeen[splashid] = true;
                 Game1.Save(Game1.saveData);
-                splashSize[0] = Game1.PixelFont.MeasureString(splashtexts[splashid]).X;
-                splashSize[1] = Game1.PixelFont.MeasureString(splashtexts[splashid]).Y;
-                Game1.Window.Title = "BBGSim - " + splashtexts[splashid];
+                reverseText = false;
+                if (splashtexts[splashid].Contains("§R"))
+                {
+                    reverseText = true;
+                }
+                splash = splashtexts[splashid].Replace("§R", string.Empty).Replace("§C", MathF.Ceiling(jumpscareCountdown).ToString()).Replace("§W", string.Empty);
+                splashSize[0] = Game1.PixelFont.MeasureString(splash).X;
+                splashSize[1] = Game1.PixelFont.MeasureString(splash).Y;
+                Game1.Window.Title = "BBGSim - " + splash;
                 splashesSeen = 0;
                 foreach(bool value in Game1.saveData.splashesSeen)
                 {
@@ -383,18 +400,40 @@ namespace Cheesenaf
                 splashid += 1;
                 Game1.saveData.splashesSeen[splashid] = true;
                 Game1.Save(Game1.saveData);
-                splashSize[0] = Game1.PixelFont.MeasureString(splashtexts[splashid]).X;
-                splashSize[1] = Game1.PixelFont.MeasureString(splashtexts[splashid]).Y;
-                Game1.Window.Title = "BBGSim - " + splashtexts[splashid];
+                reverseText = false;
+                if (splashtexts[splashid].Contains("§R"))
+                {
+                    reverseText = true;
+                }
+                splash = splashtexts[splashid].Replace("§R", string.Empty).Replace("§C", MathF.Ceiling(jumpscareCountdown).ToString()).Replace("§W", string.Empty);
+                splashSize[0] = Game1.PixelFont.MeasureString(splash).X;
+                splashSize[1] = Game1.PixelFont.MeasureString(splash).Y;
+                Game1.Window.Title = "BBGSim - " + splash;
+                splashesSeen = 0;
+                foreach (bool value in Game1.saveData.splashesSeen)
+                {
+                    if (value) splashesSeen++;
+                }
             }
             if (Game1.GetKeyUp(Keys.Down) && splashid > 0 && Game1.isDebugMode)
             {
                 splashid -= 1;
                 Game1.saveData.splashesSeen[splashid] = true;
                 Game1.Save(Game1.saveData);
-                splashSize[0] = Game1.PixelFont.MeasureString(splashtexts[splashid]).X;
-                splashSize[1] = Game1.PixelFont.MeasureString(splashtexts[splashid]).Y;
-                Game1.Window.Title = "BBGSim - " + splashtexts[splashid];
+                reverseText = false;
+                if (splashtexts[splashid].Contains("§R"))
+                {
+                    reverseText = true;
+                }
+                splash = splashtexts[splashid].Replace("§R", string.Empty).Replace("§C", MathF.Ceiling(jumpscareCountdown).ToString()).Replace("§W", string.Empty);
+                splashSize[0] = Game1.PixelFont.MeasureString(splash).X;
+                splashSize[1] = Game1.PixelFont.MeasureString(splash).Y;
+                Game1.Window.Title = "BBGSim - " + splash;
+                splashesSeen = 0;
+                foreach (bool value in Game1.saveData.splashesSeen)
+                {
+                    if (value) splashesSeen++;
+                }
             }
             if (Game1.GetKeyUp(Keys.L) && Game1.isDebugMode)
             {
@@ -412,7 +451,7 @@ namespace Cheesenaf
                 }
             }
             
-            if (Game1.GetKeyUp(Keys.W) && splashid == 171)
+            if (Game1.GetKeyUp(Keys.W) && splashtexts[splashid].Contains("§W"))
             {
                 wumbo.Play();
             }
@@ -424,13 +463,13 @@ namespace Cheesenaf
             unlockAlpha -= Game1.delta;
             unlockAlpha = Math.Clamp(unlockAlpha, 0, 5);
             rainbow = new Color(MathF.Sin(time * 3), -MathF.Sin((time * 3) + 1), MathF.Cos((time * 3) + 0.5f));
-            if (splashid == 170)
+            if (splashtexts[splashid].Contains("§C"))
             {
                 jumpscareCountdown -= Game1.delta;
                 if (jumpscareCountdown < 0) jumpscareCountdown = 0;
-                splashtexts[170] = string.Format(splashtexts[170], Game1.saveData.Username == null ? "player" : Game1.saveData.Username, names[rng.Next(0, 4)], splashtexts.Length, splashtexts.Length - 1, jumpscareCountdown);
-                splashSize[0] = Game1.PixelFont.MeasureString(MathF.Ceiling(jumpscareCountdown).ToString()).X;
-                splashSize[1] = Game1.PixelFont.MeasureString(MathF.Ceiling(jumpscareCountdown).ToString()).Y;
+                splash = splashtexts[splashid].Replace("§R", string.Empty).Replace("§C", MathF.Ceiling(jumpscareCountdown).ToString()).Replace("§W", string.Empty);
+                splashSize[0] = Game1.PixelFont.MeasureString(splash).X;
+                splashSize[1] = Game1.PixelFont.MeasureString(splash).Y;
                 Game1.Window.Title = "BBGSim - " + MathF.Ceiling(jumpscareCountdown).ToString();
             }
             if (jumpscareCountdown <= 0) jumpscareIndex += 1;
@@ -443,10 +482,10 @@ namespace Cheesenaf
         {
             _spriteBatch.Draw(bg,new Vector2(-100,0),new Rectangle(0,0, 3000,1500),Color.White, 0, new Vector2(0,0), 0.72f, SpriteEffects.None, 0);
             _spriteBatch.Draw(title,new Vector2(1275,150 + titleOffsetY),new Rectangle(0,0, 1536,218),Color.White, 0, new Vector2(title.Width/2, title.Height/2), 0.72f, SpriteEffects.None, 0);
-            _spriteBatch.DrawString(Game1.PixelFont, splashid == 170 ? MathF.Ceiling(jumpscareCountdown).ToString() : splashtexts[splashid], new Vector2(splashCoords[0], splashCoords[1]), Color.SandyBrown, -titleOffsetY / 30,
-                new Vector2((splashSize[0] / 2) - 1.8f, (splashSize[1] / 2) - 1.8f), bounceTextScale, splashid == 144 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
-            _spriteBatch.DrawString(Game1.PixelFont, splashid == 170 ? MathF.Ceiling(jumpscareCountdown).ToString() : splashtexts[splashid], new Vector2(splashCoords[0], splashCoords[1]), Color.Yellow, -titleOffsetY / 30,
-                new Vector2(splashSize[0] / 2, splashSize[1] / 2), bounceTextScale, splashid == 144 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+            _spriteBatch.DrawString(Game1.PixelFont, splash, new Vector2(splashCoords[0], splashCoords[1]), Color.SandyBrown, -titleOffsetY / 30,
+                new Vector2((splashSize[0] / 2) - 1.8f, (splashSize[1] / 2) - 1.8f), bounceTextScale, reverseText == true ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+            _spriteBatch.DrawString(Game1.PixelFont, splash, new Vector2(splashCoords[0], splashCoords[1]), Color.Yellow, -titleOffsetY / 30,
+                new Vector2(splashSize[0] / 2, splashSize[1] / 2), bounceTextScale, reverseText == true ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
             _spriteBatch.DrawString(bbgfont, "Pick your bbg: " + names[Game1.saveData.Bbg], new Vector2(1100,800), Color.Black);
             _spriteBatch.DrawString(defaultfont, "<-    ->", new Vector2(1360,850), Color.Black);
             _spriteBatch.DrawString(Game1.PixelFont, "Unique Splashes seen: " + splashesSeen, new Vector2(12,1052), splashesSeen == splashtexts.Length ? Color.DarkCyan : Color.SaddleBrown);

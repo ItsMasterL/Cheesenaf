@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -10,15 +11,18 @@ namespace Cheesenaf
 {
     public class Game1 : Game
     {
+        public const string Version = "1.1.0*";
+
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         public int CurrentScene = 0;
-        //0: Title (Dating Sim), 1: Dating Scene, 2: Title (CheeseNAF), 3: Office
+        //0: Title (Dating Sim), 1: Dating Scene, 2: Title (CheeseNAF), 3: Office, 4: Mod menu
 
         private Office office;
         private MainTitle mainTitle;
         private CheesenafTitle cheesenafTitle;
         private BBGSim BBGSim;
+        private Modmenu modmenu;
 
         public Color ClearColor = Color.CornflowerBlue;
         public Texture2D debugbox;
@@ -62,6 +66,7 @@ namespace Cheesenaf
         public SpriteFont PixelFont;
         public SpriteFont BBGFont;
 
+        public List<string> Modpacks;
 
         // Initialization
         RenderTarget2D _nativeRenderTarget;
@@ -88,6 +93,8 @@ namespace Cheesenaf
                 mainTitle.LoadContent(Content);
             if (CurrentScene == 2)
                 cheesenafTitle.LoadContent(Content);
+            if (CurrentScene == 4)
+                modmenu.LoadContent(Content);
         }
 
 
@@ -121,6 +128,8 @@ namespace Cheesenaf
             BBGSim = new BBGSim();
             mainTitle = new MainTitle();
             cheesenafTitle = new CheesenafTitle();
+            modmenu = new Modmenu();
+            Modpacks = new List<string>();
             _nativeRenderTarget = new RenderTarget2D(GraphicsDevice, 1920, 1080);
             //Save Data
             if (File.Exists(SAVEPATH))
@@ -138,6 +147,17 @@ namespace Cheesenaf
             {
                 ResetData();
             }
+            if (Directory.Exists("Mods"))
+            {
+                if ((Directory.GetDirectories("Mods").Length > 0 && !saveData.SkipModMenu) || Keyboard.GetState().IsKeyDown(Keys.M))
+                {
+                    CurrentScene = 4;
+                }
+            }
+            else
+            {
+                Directory.CreateDirectory("Mods");
+            }
             //SceneLoad
             if (CurrentScene == 0)
                 mainTitle.Initialize(this);
@@ -147,6 +167,8 @@ namespace Cheesenaf
                 cheesenafTitle.Initialize(this);
             if (CurrentScene == 3)
                 office.Initialize(this);
+            if (CurrentScene == 4)
+                modmenu.Initialize(this);
 
             base.Initialize();
 
@@ -173,10 +195,10 @@ namespace Cheesenaf
                 {
                     ToggleFullscreen();
                 }
-                //if (GetKeyDown(Keys.OemTilde)) //DELETE IN FINAL BUILD
-                //{
-                //    isDebugMode = !isDebugMode;
-                //}
+                if (GetKeyDown(Keys.OemTilde) && saveData.EnableDebugTogglewithTildeKey)
+                {
+                    isDebugMode = !isDebugMode;
+                }
 
                 keyboardLastFrame = keyboardThisFrame;
                 keyboardThisFrame = Keyboard.GetState();
@@ -197,6 +219,8 @@ namespace Cheesenaf
                     }
                     else
                         office.Update(gameTime);
+                if (CurrentScene == 4)
+                    modmenu.Update(gameTime);
                 if (isDebugMode)
                 {
                     if (GetKeyDown(Keys.D1)) ChangeScene(1);
@@ -253,6 +277,8 @@ namespace Cheesenaf
                 else
                     office.Draw(_spriteBatch, gameTime, defaultfont, PixelFont, debugbox);
             }
+            if (CurrentScene == 4)
+                modmenu.Draw(_spriteBatch, gameTime, defaultfont, debugbox);
             //FPS
             if (showFPS) _spriteBatch.DrawString(PixelFont, Math.Round(1 / gameTime.ElapsedGameTime.TotalSeconds).ToString() + " FPS", new Vector2(0, 0), Color.White);
             _spriteBatch.End();
@@ -303,11 +329,15 @@ namespace Cheesenaf
                     cheesenafTitle.Initialize(this);
                     cheesenafTitle.LoadContent(Content);
                     break;
-
                 case 3:
                     office = new Office();
                     office.Initialize(this);
                     office.LoadContent(Content);
+                    break;
+                case 4:
+                    modmenu = new Modmenu();
+                    modmenu.Initialize(this);
+                    modmenu.LoadContent(Content);
                     break;
             }
         }
@@ -331,6 +361,19 @@ namespace Cheesenaf
         {
             if (mouseLastFrame.LeftButton == ButtonState.Released && mouseThisFrame.LeftButton == ButtonState.Pressed) return true;
             else return false;
+        }
+        public int GetScrollWheel()
+        {
+            return mouseThisFrame.ScrollWheelValue - mouseLastFrame.ScrollWheelValue;
+        }
+        public int GetScrollWheel(int ReturnedValue)
+        {
+            if (mouseThisFrame.ScrollWheelValue > mouseLastFrame.ScrollWheelValue)
+                return ReturnedValue;
+
+            if (mouseThisFrame.ScrollWheelValue < mouseLastFrame.ScrollWheelValue)
+                return -ReturnedValue;
+            return 0;
         }
 
         public SaveData LoadSave()
@@ -360,10 +403,22 @@ namespace Cheesenaf
                 FullScreen = true,
                 UnlockedSecret = false,
                 splashesSeen = new bool[200],
+                SkipModMenu = false,
+                EnableDebugTogglewithTildeKey = false,
+                enabledMods = null,
             };
             Save(saveData);
             if (CurrentScene != 0) ChangeScene(0);
         }
 
+        public void OpenURL(string url)
+        {
+            try
+            {
+                System.Diagnostics.ProcessStartInfo webPage = new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true };
+                System.Diagnostics.Process.Start(webPage);
+            }
+            catch { }
+        }
     }
 }
