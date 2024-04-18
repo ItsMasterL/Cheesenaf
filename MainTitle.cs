@@ -5,6 +5,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using System;
+using System.IO;
+using static Cheesenaf.Modmenu;
+using System.Text.Json;
 
 namespace Cheesenaf
 {
@@ -63,7 +66,17 @@ namespace Cheesenaf
             }
             return 999;
         }
-        private string[] splashtexts =
+        public class Splashes
+        {
+            public string[] splashtext {  get; set; }
+        }
+
+        public Splashes Modtext = new Splashes()
+        {
+            splashtext = ["Broken"]
+        };
+
+        public string[] splashtexts =
             [
                 "Not a dating sim!",
                 "WOOOOOOOOOOOO!",
@@ -266,6 +279,7 @@ namespace Cheesenaf
                 "Personality!?!?!?!?!",
                 "Peter, what are you doing?"
             ];
+        bool splashesModded;
         int splashid;
         float time;
         int[] splashCoords = new int[2] { 1500, 250 };
@@ -292,9 +306,33 @@ namespace Cheesenaf
             Game1.ClearColor = Color.LightPink;
             names = ["Syowen", "Mocha", "Brett", "Alan", "Berry"];
             rng = new Random();
+            if (Game1.Modpacks.Count > 0)
+            {
+                foreach (string mod in Game1.Modpacks)
+                {
+                    if (File.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "text" + Path.DirectorySeparatorChar + "splash.json"))
+                    {
+                        try
+                        {
+                            string file = File.ReadAllText("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "text" + Path.DirectorySeparatorChar + "splash.json");
+                            Modtext = JsonSerializer.Deserialize<Splashes>(file);
+                            if (Modtext.splashtext != null)
+                            {
+                                splashtexts = Modtext.splashtext;
+                                splashesModded = true;
+                            }
+                            break;
+                        }
+                        catch { }
+                    }
+                }
+            }
             splashid = rng.Next(0, splashtexts.Length);
-            Game1.saveData.splashesSeen[splashid] = true;
-            Game1.Save(Game1.saveData);
+            if (!splashesModded)
+            {
+                Game1.saveData.splashesSeen[splashid] = true;
+                Game1.Save(Game1.saveData);
+            }
             bounceTextScale = 1;
             int index = 0;
             foreach (string text in splashtexts)
@@ -378,8 +416,11 @@ namespace Cheesenaf
             if (Game1.GetKeyUp(Keys.S) && Game1.keyboardThisFrame.IsKeyDown(Keys.LeftShift) && Game1.keyboardThisFrame.IsKeyDown(Keys.RightShift))
             {
                 splashid = rng.Next(0, splashtexts.Length);
-                Game1.saveData.splashesSeen[splashid] = true;
-                Game1.Save(Game1.saveData);
+                if (!splashesModded)
+                {
+                    Game1.saveData.splashesSeen[splashid] = true;
+                    Game1.Save(Game1.saveData);
+                }
                 reverseText = false;
                 if (splashtexts[splashid].Contains("§R"))
                 {
@@ -398,8 +439,11 @@ namespace Cheesenaf
             if (Game1.GetKeyUp(Keys.Up) && splashid < splashtexts.Length - 1 && Game1.isDebugMode)
             {
                 splashid += 1;
-                Game1.saveData.splashesSeen[splashid] = true;
-                Game1.Save(Game1.saveData);
+                if (!splashesModded)
+                {
+                    Game1.saveData.splashesSeen[splashid] = true;
+                    Game1.Save(Game1.saveData);
+                }
                 reverseText = false;
                 if (splashtexts[splashid].Contains("§R"))
                 {
@@ -418,8 +462,11 @@ namespace Cheesenaf
             if (Game1.GetKeyUp(Keys.Down) && splashid > 0 && Game1.isDebugMode)
             {
                 splashid -= 1;
-                Game1.saveData.splashesSeen[splashid] = true;
-                Game1.Save(Game1.saveData);
+                if (!splashesModded)
+                {
+                    Game1.saveData.splashesSeen[splashid] = true;
+                    Game1.Save(Game1.saveData);
+                }
                 reverseText = false;
                 if (splashtexts[splashid].Contains("§R"))
                 {
@@ -488,8 +535,16 @@ namespace Cheesenaf
                 new Vector2(splashSize[0] / 2, splashSize[1] / 2), bounceTextScale, reverseText == true ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
             _spriteBatch.DrawString(bbgfont, "Pick your bbg: " + names[Game1.saveData.Bbg], new Vector2(1100,800), Color.Black);
             _spriteBatch.DrawString(defaultfont, "<-    ->", new Vector2(1360,850), Color.Black);
-            _spriteBatch.DrawString(Game1.PixelFont, "Unique Splashes seen: " + splashesSeen, new Vector2(12,1052), splashesSeen == splashtexts.Length ? Color.DarkCyan : Color.SaddleBrown);
-            _spriteBatch.DrawString(Game1.PixelFont, "Unique Splashes seen: " + splashesSeen, new Vector2(10,1050), splashesSeen == splashtexts.Length ? Color.Cyan : Color.Yellow);
+            if (!splashesModded)
+            {
+                _spriteBatch.DrawString(Game1.PixelFont, "Unique Splashes seen: " + splashesSeen, new Vector2(12, 1052), splashesSeen == splashtexts.Length ? Color.DarkCyan : Color.SaddleBrown);
+                _spriteBatch.DrawString(Game1.PixelFont, "Unique Splashes seen: " + splashesSeen, new Vector2(10, 1050), splashesSeen == splashtexts.Length ? Color.Cyan : Color.Yellow);
+            }
+            else
+            {
+                _spriteBatch.DrawString(Game1.PixelFont, "[Modded] Total splash count: " + splashtexts.Length, new Vector2(12, 1052), Color.DarkGreen);
+                _spriteBatch.DrawString(Game1.PixelFont, "[Modded] Total splash count: " + splashtexts.Length, new Vector2(10, 1050), Color.LimeGreen);
+            }
             if (Game1.saveData.UnlockedSecret && Game1.saveData.SixUnlocked && Game1.saveData.CustomUnlocked && splashesSeen == splashtexts.Length)
             {
                 _spriteBatch.DrawString(Game1.PixelFont, "Save file at 100%!! Thank you for playing!", new Vector2(12, 1027), new Color(rainbow.R / 2, rainbow.G / 2, rainbow.B / 2));

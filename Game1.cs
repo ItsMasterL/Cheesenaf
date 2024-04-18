@@ -57,6 +57,7 @@ namespace Cheesenaf
         public MouseState mouseState;
         public int MouseX;
         public int MouseY;
+        public Point MousePos;
 
         public bool sneakyLoad;
 
@@ -142,6 +143,18 @@ namespace Cheesenaf
                     CurrentScene = 2;
                 }
                 if (!saveData.FullScreen) ToggleFullscreen();
+                if (saveData.enabledMods != null)
+                {
+                    foreach (string pack in saveData.enabledMods)
+                    {
+                        if (Directory.Exists("Mods" + Path.DirectorySeparatorChar + pack) && !Modpacks.Contains(pack))
+                        {
+                            Modpacks.Add(pack);
+                        }
+                    }
+                    saveData.enabledMods = Modpacks.ToArray();
+                    Save(saveData);
+                }
             }
             else
             {
@@ -182,6 +195,7 @@ namespace Cheesenaf
             mouseState = Mouse.GetState();
             MouseX = (int)MathF.Round(mouseState.X * ScaleX);
             MouseY = (int)MathF.Round(mouseState.Y * ScaleY);
+            MousePos = new Point(MouseX, MouseY);
             
             if (this.IsActive || mainTitle.loading || (CurrentScene == 3 && office.loaded == false))
             {
@@ -281,6 +295,7 @@ namespace Cheesenaf
                 modmenu.Draw(_spriteBatch, gameTime, defaultfont, debugbox);
             //FPS
             if (showFPS) _spriteBatch.DrawString(PixelFont, Math.Round(1 / gameTime.ElapsedGameTime.TotalSeconds).ToString() + " FPS", new Vector2(0, 0), Color.White);
+            if (showFPS) _spriteBatch.DrawString(PixelFont, saveData.enabledMods.Length + " mod(s) enabled", new Vector2(0, 25), Color.White);
             _spriteBatch.End();
 
             base.Draw(gameTime);
