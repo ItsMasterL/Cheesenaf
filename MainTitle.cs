@@ -362,8 +362,9 @@ namespace Cheesenaf
 
         public void Update(GameTime gameTime)
         {
-            if (Game1.GetKeyDown(Keys.F12))
+            if (Game1.GetKeyUp(Keys.F12))
             {
+                MediaPlayer.Stop();
                 Game1.ChangeScene(4);
             }
             if (splashtexts[splashid].Contains("§C")) loading = true;

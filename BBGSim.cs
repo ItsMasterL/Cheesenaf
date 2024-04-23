@@ -6,19 +6,32 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Text;
 using Microsoft.Xna.Framework.Audio;
+using System.IO;
+using System.Collections.Generic;
+using System.Text.Json;
 
 namespace Cheesenaf
 {
     internal class BBGSim
     {
         Game1 Game1;
-        string[] names;
-        string[] syowenDialogue;
-        string[] mochaDialogue;
-        string[] brettDialogue;
-        string[] alanDialogue;
-        string[] berryDialogue;
-        string[] playerDialogue;
+        public class BBG()
+        {
+            public string Name { get; set; }
+            public List<string> BBGDialogue { get; set; }
+            public List<string> PlayerDialogue { get; set; }
+            public Color Color { get; set; }
+            public bool OverlayExpression { get; set; }
+        }
+        BBG Syowen;
+        BBG Mocha;
+        BBG Brett;
+        BBG Alan;
+        BBG Berry;
+        BBG Custom;
+        string name;
+        List<string> bbgDialogue;
+        List<string> playerDialogue;
         string display = "";
         string buffer = "";
         string userInput;
@@ -28,7 +41,6 @@ namespace Cheesenaf
         int dialoguePart = -1;
 
         int[] textcoords = new int[2] {360,900};
-        const int dialogueCount = 11;
         const float wraplimit = 1000f;
 
         int choicesPulledUp;
@@ -46,7 +58,8 @@ namespace Cheesenaf
         Texture2D[] bgs;
         SoundEffect[] voices;
         int emotion = 1;
-        Color[] nametagColor = [new Color(185, 56, 255), new Color(20, 148, 222), new Color(23, 189, 131), new Color(8, 140, 37), new Color(255, 143, 186)];
+        bool emotionOverlay;
+        Color nametagColor;
         Song song;
 
         Texture2D dialogueUI;
@@ -60,81 +73,165 @@ namespace Cheesenaf
         public void LoadContent(ContentManager Content)
         {
             bbgs = new Texture2D[4];
-            if (Game1.saveData.Bbg == 0)
-            {
-                bbgs[0] = Content.Load<Texture2D>("BBGSim/syowen");
-                bbgs[1] = Content.Load<Texture2D>("BBGSim/syowenhappy");
-                bbgs[2] = Content.Load<Texture2D>("BBGSim/syowenneutral");
-                bbgs[3] = Content.Load<Texture2D>("BBGSim/syowenunhappy");
-            }
-            if (Game1.saveData.Bbg == 1)
-            {
-                bbgs[0] = Content.Load<Texture2D>("BBGSim/mocha");
-                bbgs[1] = Content.Load<Texture2D>("BBGSim/mochahappy");
-                bbgs[2] = Content.Load<Texture2D>("BBGSim/mochaneutral");
-                bbgs[3] = Content.Load<Texture2D>("BBGSim/mochaunhappy");
-            }
-            if (Game1.saveData.Bbg == 2)
-            {
-                bbgs[0] = Content.Load<Texture2D>("BBGSim/brett");
-                bbgs[1] = Content.Load<Texture2D>("BBGSim/bretthappy");
-                bbgs[2] = Content.Load<Texture2D>("BBGSim/brettneutral");
-                bbgs[3] = Content.Load<Texture2D>("BBGSim/brettunhappy");
-            }
-            if (Game1.saveData.Bbg == 3)
-            {
-                bbgs[0] = Content.Load<Texture2D>("BBGSim/alan");
-                bbgs[1] = Content.Load<Texture2D>("BBGSim/alanhappy");
-                bbgs[2] = Content.Load<Texture2D>("BBGSim/alanneutral");
-                bbgs[3] = Content.Load<Texture2D>("BBGSim/alanunhappy");
-            }
-            if (Game1.saveData.Bbg == 4)
-            {
-                bbgs[0] = Content.Load<Texture2D>("BBGSim/berry");
-                bbgs[1] = Content.Load<Texture2D>("BBGSim/berryhappy");
-                bbgs[2] = Content.Load<Texture2D>("BBGSim/berryneutral");
-                bbgs[3] = Content.Load<Texture2D>("BBGSim/berryunhappy");
-            }
             voices = new SoundEffect[5];
-            if (Game1.saveData.Bbg == 0)
+            switch (Game1.saveData.Bbg)
             {
-                voices[0] = Content.Load<SoundEffect>("Audio/Voices/sb_a");
-                voices[1] = Content.Load<SoundEffect>("Audio/Voices/sb_i");
-                voices[2] = Content.Load<SoundEffect>("Audio/Voices/sb_u");
-                voices[3] = Content.Load<SoundEffect>("Audio/Voices/sb_e");
-                voices[4] = Content.Load<SoundEffect>("Audio/Voices/sb_o");
-            }
-            if (Game1.saveData.Bbg == 1)
-            {
-                voices[0] = Content.Load<SoundEffect>("Audio/Voices/mm_a");
-                voices[1] = Content.Load<SoundEffect>("Audio/Voices/mm_i");
-                voices[2] = Content.Load<SoundEffect>("Audio/Voices/mm_u");
-                voices[3] = Content.Load<SoundEffect>("Audio/Voices/mm_e");
-                voices[4] = Content.Load<SoundEffect>("Audio/Voices/mm_o");
-            }
-            if (Game1.saveData.Bbg == 2)
-            {
-                voices[0] = Content.Load<SoundEffect>("Audio/Voices/gb_a");
-                voices[1] = Content.Load<SoundEffect>("Audio/Voices/gb_i");
-                voices[2] = Content.Load<SoundEffect>("Audio/Voices/gb_u");
-                voices[3] = Content.Load<SoundEffect>("Audio/Voices/gb_e");
-                voices[4] = Content.Load<SoundEffect>("Audio/Voices/gb_o");
-            }
-            if (Game1.saveData.Bbg == 3)
-            {
-                voices[0] = Content.Load<SoundEffect>("Audio/Voices/sawyer-01");
-                voices[1] = Content.Load<SoundEffect>("Audio/Voices/sawyer-02");
-                voices[2] = Content.Load<SoundEffect>("Audio/Voices/sawyer-03");
-                voices[3] = Content.Load<SoundEffect>("Audio/Voices/sawyer-04");
-                voices[4] = Content.Load<SoundEffect>("Audio/Voices/sawyer-05");
-            }
-            if (Game1.saveData.Bbg == 4)
-            {
-                voices[0] = Content.Load<SoundEffect>("Audio/Voices/sawyer-01");
-                voices[1] = Content.Load<SoundEffect>("Audio/Voices/sawyer-02");
-                voices[2] = Content.Load<SoundEffect>("Audio/Voices/sawyer-03");
-                voices[3] = Content.Load<SoundEffect>("Audio/Voices/sawyer-04");
-                voices[4] = Content.Load<SoundEffect>("Audio/Voices/sawyer-05");
+                default:
+                    foreach (string mod in Game1.Modpacks)
+                    {
+                        if (Directory.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Syowen"))
+                        {
+                            string path = "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Syowen" + Path.DirectorySeparatorChar;
+                            try
+                            {
+                                bbgs[0] = Texture2D.FromFile(Game1.GraphicsDevice, path + "base.png");
+                                bbgs[1] = Texture2D.FromFile(Game1.GraphicsDevice, path + "happy.png");
+                                bbgs[2] = Texture2D.FromFile(Game1.GraphicsDevice, path + "neutral.png");
+                                bbgs[3] = Texture2D.FromFile(Game1.GraphicsDevice, path + "unhappy.png");
+                                voices[0] = Content.Load<SoundEffect>("Audio/Voices/sb_a");
+                                voices[1] = Content.Load<SoundEffect>("Audio/Voices/sb_i");
+                                voices[2] = Content.Load<SoundEffect>("Audio/Voices/sb_u");
+                                voices[3] = Content.Load<SoundEffect>("Audio/Voices/sb_e");
+                                voices[4] = Content.Load<SoundEffect>("Audio/Voices/sb_o");
+                                string json = File.ReadAllText(path + "details.json");
+                                Custom = JsonSerializer.Deserialize<BBG>(json);
+                                bbgDialogue = Custom.BBGDialogue;
+                                playerDialogue = Custom.PlayerDialogue;
+                                name = Custom.Name;
+                                nametagColor = Custom.Color;
+                                emotionOverlay = Custom.OverlayExpression;
+                                break;
+                            }
+                            catch
+                            {
+                                bbgs[0] = Content.Load<Texture2D>("BBGSim/syowen");
+                                bbgs[1] = Content.Load<Texture2D>("BBGSim/syowenhappy");
+                                bbgs[2] = Content.Load<Texture2D>("BBGSim/syowenneutral");
+                                bbgs[3] = Content.Load<Texture2D>("BBGSim/syowenunhappy");
+                                voices[0] = Content.Load<SoundEffect>("Audio/Voices/sb_a");
+                                voices[1] = Content.Load<SoundEffect>("Audio/Voices/sb_i");
+                                voices[2] = Content.Load<SoundEffect>("Audio/Voices/sb_u");
+                                voices[3] = Content.Load<SoundEffect>("Audio/Voices/sb_e");
+                                voices[4] = Content.Load<SoundEffect>("Audio/Voices/sb_o");
+                                bbgDialogue = Syowen.BBGDialogue;
+                                playerDialogue = Syowen.PlayerDialogue;
+                                name = Syowen.Name;
+                                nametagColor = Syowen.Color;
+                                emotionOverlay = Syowen.OverlayExpression;
+                            }
+                        }
+                    }
+                    break;
+                case 1:
+                    bbgs[0] = Content.Load<Texture2D>("BBGSim/mocha");
+                    bbgs[1] = Content.Load<Texture2D>("BBGSim/mochahappy");
+                    bbgs[2] = Content.Load<Texture2D>("BBGSim/mochaneutral");
+                    bbgs[3] = Content.Load<Texture2D>("BBGSim/mochaunhappy");
+                    voices[0] = Content.Load<SoundEffect>("Audio/Voices/mm_a");
+                    voices[1] = Content.Load<SoundEffect>("Audio/Voices/mm_i");
+                    voices[2] = Content.Load<SoundEffect>("Audio/Voices/mm_u");
+                    voices[3] = Content.Load<SoundEffect>("Audio/Voices/mm_e");
+                    voices[4] = Content.Load<SoundEffect>("Audio/Voices/mm_o");
+                    bbgDialogue = Mocha.BBGDialogue;
+                    playerDialogue = Mocha.PlayerDialogue;
+                    name = Mocha.Name;
+                    nametagColor = Mocha.Color;
+                    emotionOverlay = Mocha.OverlayExpression;
+                    break;
+                case 2:
+                    bbgs[0] = Content.Load<Texture2D>("BBGSim/brett");
+                    bbgs[1] = Content.Load<Texture2D>("BBGSim/bretthappy");
+                    bbgs[2] = Content.Load<Texture2D>("BBGSim/brettneutral");
+                    bbgs[3] = Content.Load<Texture2D>("BBGSim/brettunhappy");
+                    voices[0] = Content.Load<SoundEffect>("Audio/Voices/gb_a");
+                    voices[1] = Content.Load<SoundEffect>("Audio/Voices/gb_i");
+                    voices[2] = Content.Load<SoundEffect>("Audio/Voices/gb_u");
+                    voices[3] = Content.Load<SoundEffect>("Audio/Voices/gb_e");
+                    voices[4] = Content.Load<SoundEffect>("Audio/Voices/gb_o");
+                    bbgDialogue = Brett.BBGDialogue;
+                    playerDialogue = Brett.PlayerDialogue;
+                    name = Brett.Name;
+                    nametagColor = Brett.Color;
+                    emotionOverlay = Brett.OverlayExpression;
+                    break;
+                case 3:
+                    bbgs[0] = Content.Load<Texture2D>("BBGSim/alan");
+                    bbgs[1] = Content.Load<Texture2D>("BBGSim/alanhappy");
+                    bbgs[2] = Content.Load<Texture2D>("BBGSim/alanneutral");
+                    bbgs[3] = Content.Load<Texture2D>("BBGSim/alanunhappy");
+                    voices[0] = Content.Load<SoundEffect>("Audio/Voices/sawyer-01");
+                    voices[1] = Content.Load<SoundEffect>("Audio/Voices/sawyer-02");
+                    voices[2] = Content.Load<SoundEffect>("Audio/Voices/sawyer-03");
+                    voices[3] = Content.Load<SoundEffect>("Audio/Voices/sawyer-04");
+                    voices[4] = Content.Load<SoundEffect>("Audio/Voices/sawyer-05");
+                    bbgDialogue = Alan.BBGDialogue;
+                    playerDialogue = Alan.PlayerDialogue;
+                    name = Alan.Name;
+                    nametagColor = Alan.Color;
+                    emotionOverlay = Alan.OverlayExpression;
+                    break;
+                case 4:
+                    bbgs[0] = Content.Load<Texture2D>("BBGSim/berry");
+                    bbgs[1] = Content.Load<Texture2D>("BBGSim/berryhappy");
+                    bbgs[2] = Content.Load<Texture2D>("BBGSim/berryneutral");
+                    bbgs[3] = Content.Load<Texture2D>("BBGSim/berryunhappy");
+                    voices[0] = Content.Load<SoundEffect>("Audio/Voices/sawyer-01");
+                    voices[1] = Content.Load<SoundEffect>("Audio/Voices/sawyer-02");
+                    voices[2] = Content.Load<SoundEffect>("Audio/Voices/sawyer-03");
+                    voices[3] = Content.Load<SoundEffect>("Audio/Voices/sawyer-04");
+                    voices[4] = Content.Load<SoundEffect>("Audio/Voices/sawyer-05");
+                    bbgDialogue = Berry.BBGDialogue;
+                    playerDialogue = Berry.PlayerDialogue;
+                    name = Berry.Name;
+                    nametagColor = Berry.Color;
+                    emotionOverlay = Berry.OverlayExpression;
+                    break;
+                case 5:
+                    foreach (string mod in Game1.Modpacks)
+                    {
+                        if (Directory.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs"))
+                        {
+                            string path = "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar;
+                            try
+                            {
+                                bbgs[0] = Texture2D.FromFile(Game1.GraphicsDevice, path + "base");
+                                bbgs[1] = Texture2D.FromFile(Game1.GraphicsDevice, path + "happy");
+                                bbgs[2] = Texture2D.FromFile(Game1.GraphicsDevice, path + "neutral");
+                                bbgs[3] = Texture2D.FromFile(Game1.GraphicsDevice, path + "unhappy");
+                                voices[0] = Content.Load<SoundEffect>("Audio/Voices/sawyer-01");
+                                voices[1] = Content.Load<SoundEffect>("Audio/Voices/sawyer-02");
+                                voices[2] = Content.Load<SoundEffect>("Audio/Voices/sawyer-03");
+                                voices[3] = Content.Load<SoundEffect>("Audio/Voices/sawyer-04");
+                                voices[4] = Content.Load<SoundEffect>("Audio/Voices/sawyer-05");
+                                string json = File.ReadAllText(path + "details.json");
+                                Custom = JsonSerializer.Deserialize<BBG>(json);
+                                bbgDialogue = Custom.BBGDialogue;
+                                playerDialogue = Custom.PlayerDialogue;
+                                name = Custom.Name;
+                                nametagColor = Custom.Color;
+                                emotionOverlay = Custom.OverlayExpression;
+                                break;
+                            }
+                            catch 
+                            {
+                                bbgs[0] = Content.Load<Texture2D>("BBGSim/syowen");
+                                bbgs[1] = Content.Load<Texture2D>("BBGSim/syowenhappy");
+                                bbgs[2] = Content.Load<Texture2D>("BBGSim/syowenneutral");
+                                bbgs[3] = Content.Load<Texture2D>("BBGSim/syowenunhappy");
+                                voices[0] = Content.Load<SoundEffect>("Audio/Voices/sb_a");
+                                voices[1] = Content.Load<SoundEffect>("Audio/Voices/sb_i");
+                                voices[2] = Content.Load<SoundEffect>("Audio/Voices/sb_u");
+                                voices[3] = Content.Load<SoundEffect>("Audio/Voices/sb_e");
+                                voices[4] = Content.Load<SoundEffect>("Audio/Voices/sb_o");
+                                bbgDialogue = Syowen.BBGDialogue;
+                                playerDialogue = Syowen.PlayerDialogue;
+                                name = Syowen.Name;
+                                nametagColor = Syowen.Color;
+                                emotionOverlay = Syowen.OverlayExpression;
+                            }
+                        }
+                    }
+                    break;
             }
             sounds = new SoundEffect[6];
             sounds[0] = Content.Load<SoundEffect>("BBGSim/bbgtext");
@@ -147,7 +244,7 @@ namespace Cheesenaf
             boxZooms = sounds[0].CreateInstance();
             dialogueUI = Content.Load<Texture2D>("BBGSim/bbgdialogue");
             enterSign = Content.Load<Texture2D>("BBGSim/entersymbol");
-            bgs = new Texture2D[2] { Content.Load<Texture2D>("BBGSim/Cherry_Blossom_Tree"), Content.Load<Texture2D>("BBGSim/Lanterns") };
+            bgs = [Content.Load<Texture2D>("BBGSim/Cherry_Blossom_Tree"), Content.Load<Texture2D>("BBGSim/Lanterns")];
             UIRects[0] = new Rectangle(0,0,1592,604); //Textbox
             UIRects[1] = new Rectangle(107,671,824,300); //Nametag
             UIRects[2] = new Rectangle(1047,637,543,524); //Choicesbox
@@ -167,40 +264,83 @@ namespace Cheesenaf
         {
             Game1 = game1;
             Game1.ClearColor = Color.LightPink;
-            names = ["Syowen", "Mocha", "Brett", "Alan", "Berry"];
-            syowenDialogue = new string[dialogueCount]
+
+            Syowen = new BBG()
             {
-                "Oh, hey. I'm Syowen. What's your name?", "Huh. {0}, huh?", "You seem pretty cool, want to check out the star festival tonight?", "Awesome, see you there bbg",
-                "Oh hey, you made it!", "Oh cool, thanks!", "Pizza? Erm.. well...", "Just, bad memories with that.", "Yeah, the pizza.", "Oh, okay. See you later.", "Welcome back, {0}..."
+                Name = "Syowen",
+                BBGDialogue = new List<string>
+                {
+                    "Oh, hey. I'm Syowen. What's your name?", "Huh. {0}, huh?", "You seem pretty cool, want to check out the star festival tonight?", "Awesome, see you there bbg",
+                    "Oh hey, you made it!", "Oh cool, thanks!", "Pizza? Erm.. well...", "Just, bad memories with that.", "Yeah, the pizza.", "Oh, okay. See you later.", "Welcome back, {0}..."
+                },
+                PlayerDialogue = new List<string>
+                {
+                    "Sure!", "Nah", "I got you some\n food!", "What's wrong?", "With... Pizza?", "What happened?"
+                },
+                Color = new Color(185, 56, 255),
+                OverlayExpression = true,
             };
-            mochaDialogue = new string[dialogueCount]
+            Mocha = new BBG()
             {
+                Name = "Mocha",
+                BBGDialogue = new List<string>
+                {
                 "Heyo! I'm Mocha, and you areeee...?", "You said {0}? Cool, nice to meet you!", "Hey, theres this cool star festival thing going on, wanna check it out?", "Alright, see you there!",
                 "Glad you made it!", "Ooh! You're so thoughtful, thank you!", "Pizza...? With.. stuffed crust..?", "...Don't worry about it, just... bad memories...", "mhm...", "Oh... Alright. bye guys", "Welcome back, {0}..."
+                },
+                PlayerDialogue = new List<string>
+                {
+                    "Sounds good!", "No I don't", "I got you some\n food!", "What's wrong?", "From... Pizza?", "What happened?"
+                },
+                Color = new Color(20, 148, 222),
+                OverlayExpression = true,
             };
-            brettDialogue = new string[dialogueCount]
+            Brett = new BBG()
             {
+                Name = "Brett",
+                BBGDialogue = new List<string>
+                {
                 "Yo, what up... Why are you wearing a nametag?", "Dude, your name is {0}? That's awesome", "Yo they got the star festival going on tonight, who out here marioing they galaxy",
                 "That's whats up", "Yo what up", "thanks dude", "Pizza? Really? why pizza", "Pizza is mid. I had bad stuff happen around it before", "yeah", "That's lame", "Welcome back, {0}..."
+                },
+                PlayerDialogue = new List<string>
+                {
+                    "Dude I am", "Not me lol", "I got you some\n food!", "What's wrong?", "Bad stuff?", "What happened?"
+                },
+                Color = new Color(20, 148, 222),
+                OverlayExpression = true,
             };
-            alanDialogue = new string[dialogueCount]
+            Alan = new BBG()
             {
-                "Hey there! What's your name?", "Nice to meet you, {0}, I'm Alan!", "Hey theres a star festival thing tonight, you should be there tonight", "Alright, sounds good!",
+                Name = "Alan",
+                BBGDialogue = new List<string>
+                {
+                "Hey there! What's your name?", "Nice to meet you, {0}, I'm Alan!", "Hey theres a star festival thing tonight, you should be there tonight!", "Alright, sounds good!",
                 "Oh hey, you're here!", "Awesome, thanks!", "Ohhh. Pizza...", "Yeeeaaah, no I dont have good memories with pizza.", "Yyyyyeahh.", "Oh. okay bye", "Welcome back, {0}..."
+                },
+                PlayerDialogue = new List<string>
+                {
+                    "Okay", "No", "I got you some\n food!", "What's wrong?", "You don't?", "What happened?"
+                },
+                Color = new Color(8, 140, 37),
+                OverlayExpression = true,
             };
-            berryDialogue = new string[dialogueCount]
+            Berry = new BBG()
             {
+                Name = "Berry",
+                BBGDialogue = new List<string>
+                {
                 "Hi! My name is Berry, what's yours?", "Nice to meet you, {0}!", "Hey theres a star festival thing tonight, you should come with me there!", "Great! See you there, {0}!",
                 "About time you made it!", "Awe, how thoughtful of you!", "...\niiit's a slice of pizza, yaayyyyy...", "I'm sorry, I just, really haven't had a good experience with pizza, especially with the stuffed crust...", "Yeah, no, none at all.", "Alright, your loss.", "Welcome back, {0}..."
+                },
+                PlayerDialogue = new List<string>
+                {
+                    "Sure!", "No thanks", "I got you some\n food!", "What's wrong?", "Really?", "What happened?"
+                },
+                Color = new Color(255, 143, 186),
+                OverlayExpression = true,
             };
-            playerDialogue = new string[50]
-            {
-                "Sure!","Nah","Sounds good!","No I don't","Dude I am","Not me lol","Okay","No", "Sure!", "No thanks",
-                "I got you some\n food!","","I got you some\n food!","","I got you some\n food!","","I got you some\n food!","","I got you some\n food!","",
-                "What's wrong?","","What's wrong?","","What's wrong?","","What's wrong?","","What's wrong?","",
-                "With... Pizza?","","From... Pizza?","","Bad stuff?","","You don't?","","Really?","",
-                "What \nhappened?","","What \nhappened?","","What \nhappened?","","What \nhappened?","","What \nhappened?",""
-            };
+
             Game1.Window.TextInput += processTextInput;
             scaleGoal[0] = 1f;
             if (Game1.saveData.Username != null)
@@ -255,45 +395,11 @@ namespace Cheesenaf
             display = string.Empty;
             if (dialoguePart >= 0)
             {
-                switch (Game1.saveData.Bbg)
-                {
-                    default:
-                        buffer = WrapText(Game1.BBGFont, syowenDialogue[dialoguePart], wraplimit);
-                        break;
-                    case 1:
-                        buffer = WrapText(Game1.BBGFont, mochaDialogue[dialoguePart], wraplimit);
-                        break;
-                    case 2:
-                        buffer = WrapText(Game1.BBGFont, brettDialogue[dialoguePart], wraplimit);
-                        break;
-                    case 3:
-                        buffer = WrapText(Game1.BBGFont, alanDialogue[dialoguePart], wraplimit);
-                        break;
-                    case 4:
-                        buffer = WrapText(Game1.BBGFont, berryDialogue[dialoguePart], wraplimit);
-                        break;
-                }
+                buffer = WrapText(Game1.BBGFont, bbgDialogue[dialoguePart], wraplimit);
             }
             else
             {
-                switch (Game1.saveData.Bbg)
-                {
-                    default:
-                        buffer = WrapText(Game1.BBGFont, syowenDialogue[0], wraplimit);
-                        break;
-                    case 1:
-                        buffer = WrapText(Game1.BBGFont, mochaDialogue[0], wraplimit);
-                        break;
-                    case 2:
-                        buffer = WrapText(Game1.BBGFont, brettDialogue[0], wraplimit);
-                        break;
-                    case 3:
-                        buffer = WrapText(Game1.BBGFont, alanDialogue[0], wraplimit);
-                        break;
-                    case 4:
-                        buffer = WrapText(Game1.BBGFont, berryDialogue[0], wraplimit);
-                        break;
-                }
+                buffer = WrapText(Game1.BBGFont, bbgDialogue[0], wraplimit);
             }
         }
 
@@ -427,7 +533,7 @@ namespace Cheesenaf
                         {
                             emotion = 0;
                             inChoice = false;
-                            choicesPulledUp++;
+                            choicesPulledUp += 2;
                             dialoguePart++;
                             ReReadString();
                             soundInstance.Stop();
@@ -443,7 +549,7 @@ namespace Cheesenaf
                         {
                             emotion = 2;
                             inChoice = false;
-                            choicesPulledUp++;
+                            choicesPulledUp += 2;
                             dialoguePart = 9;
                             ReReadString();
                             soundInstance.Stop();
@@ -654,28 +760,29 @@ namespace Cheesenaf
             }
             if (bbgs[0] != null)
             {
-                _spriteBatch.Draw(bbgs[0], new Vector2(400, 50), new Rectangle(0, 0, 1600, 1600), Color.White, 0, new Vector2(0, 0), 0.65f, SpriteEffects.None, 0);
-                _spriteBatch.Draw(bbgs[emotion + 1], new Vector2(400, 50), new Rectangle(0, 0, 1600, 1600), Color.White, 0, new Vector2(0, 0), 0.65f, SpriteEffects.None, 0);
+                if (emotionOverlay)
+                    _spriteBatch.Draw(bbgs[0], new Rectangle(400, 50, 1040, 1040), new Rectangle(0, 0, bbgs[0].Width, bbgs[0].Height), Color.White, 0, new Vector2(0, 0), SpriteEffects.None, 0);
+                _spriteBatch.Draw(bbgs[emotion + 1], new Rectangle(400, 50, 1040, 1040), new Rectangle(0, 0, bbgs[emotion + 1].Width, bbgs[emotion + 1].Height), Color.White, 0, new Vector2(0, 0), SpriteEffects.None, 0);
             }
             _spriteBatch.Draw(dialogueUI, new Vector2(900, 1000), UIRects[0], Color.White, 0, new Vector2(UIRects[0].Width / 2, UIRects[0].Height / 2), 0.75f * scale[0], SpriteEffects.None, 0);
-            _spriteBatch.Draw(dialogueUI, new Vector2(900, 1000), UIRects[1], nametagColor[Game1.saveData.Bbg], -0.35f, new Vector2(1400, 1100), 0.35f * scale[0], SpriteEffects.None, 0);
-                _spriteBatch.DrawString(defaultfont, names[Game1.saveData.Bbg], new Vector2(942, 997), Color.White, -0.35f, new Vector2(300, 235), 1.65f * scale[0], SpriteEffects.None, 0);
+            _spriteBatch.Draw(dialogueUI, new Vector2(900, 1000), UIRects[1], nametagColor, -0.35f, new Vector2(1400, 1100), 0.35f * scale[0], SpriteEffects.None, 0);
+                _spriteBatch.DrawString(defaultfont, name, new Vector2(942, 997), Color.White, -0.35f, new Vector2(300, 235), 1.65f * scale[0], SpriteEffects.None, 0);
             //Input
             _spriteBatch.Draw(dialogueUI, new Vector2(900, 100), UIRects[3], Color.White, 0, new Vector2(UIRects[3].Width / 2, UIRects[3].Height / 2), 0.5f * scale[1], SpriteEffects.None, 0);
             _spriteBatch.DrawString(defaultfont, "Enter your name:", new Vector2(900, 100), Color.Black, 0, new Vector2(550, 70), scale[1] / 1.75f, SpriteEffects.None, 0);
             if (userInput != null)
                 _spriteBatch.DrawString(defaultfont, userInput, new Vector2(900, 100), Color.Black, 0, new Vector2(310, 20), scale[1], SpriteEffects.None, 0);
-            //Choices
-            _spriteBatch.Draw(dialogueUI, new Vector2(1500, 850), UIRects[2], Color.White, 0, new Vector2(UIRects[2].Width / 2, UIRects[2].Height / 2), 0.75f * scale[2], SpriteEffects.None, 0);
-            if (scale[2] == 1 && choicesPulledUp <= 4 && inChoice)
-            {
-                _spriteBatch.DrawString(defaultfont, (selection == 0 ? "> " : "") + playerDialogue[(Game1.saveData.Bbg * 2) + (choicesPulledUp * 10)], new Vector2(1400, 775), Color.Chocolate, 0, new Vector2(50, 0), scale[2], SpriteEffects.None, 0);
-                if (currentSelectionCount >= 2)
-                    _spriteBatch.DrawString(defaultfont, (selection == 1 ? "> " : "") + playerDialogue[((Game1.saveData.Bbg * 2) + 1) + (choicesPulledUp * 10)], new Vector2(1500, 900), Color.Chocolate, 0, new Vector2(50, 0), scale[2], SpriteEffects.None, 0);
-            }
             //Dialogue
             _spriteBatch.DrawString(defaultfont, display, new Vector2(textcoords[0], textcoords[1]), Color.Black);
-            _spriteBatch.Draw(enterSign, new Vector2(1400, 1020), nametagColor[Game1.saveData.Bbg] * Math.Abs((float)Math.Sin(enterAlpha)));
+            _spriteBatch.Draw(enterSign, new Vector2(1400, 1020), nametagColor * Math.Abs((float)Math.Sin(enterAlpha)));
+            //Choices
+            _spriteBatch.Draw(dialogueUI, new Vector2(1500, 850), UIRects[2], Color.White, 0, new Vector2(UIRects[2].Width / 2, UIRects[2].Height / 2), 0.75f * scale[2], SpriteEffects.None, 0);
+            if (scale[2] == 1 && inChoice)
+            {
+                _spriteBatch.DrawString(defaultfont, (selection == 0 ? "> " : "") + playerDialogue[choicesPulledUp], new Vector2(1400, 775), Color.Chocolate, 0, new Vector2(50, 0), scale[2], SpriteEffects.None, 0);
+                if (currentSelectionCount >= 2)
+                    _spriteBatch.DrawString(defaultfont, (selection == 1 ? "> " : "") + playerDialogue[choicesPulledUp + 1], new Vector2(1500, 900), Color.Chocolate, 0, new Vector2(50, 0), scale[2], SpriteEffects.None, 0);
+            }
         }
     }
 }

@@ -101,10 +101,7 @@ namespace Cheesenaf
 
         public void OnResize(Object sender, EventArgs e)
         {
-            ScreenWidth = GraphicsDevice.PresentationParameters.BackBufferWidth;
-            ScreenHeight = GraphicsDevice.PresentationParameters.BackBufferHeight;
-            ScaleX = 1920f / ScreenWidth;
-            ScaleY = 1080f / ScreenHeight;
+            OnResize();
         }
         public void OnResize()
         {
@@ -170,6 +167,7 @@ namespace Cheesenaf
             else
             {
                 Directory.CreateDirectory("Mods");
+                File.WriteAllText("Mods/~ModMenuInstructions~.txt","Press F12 on the title to access the mod menu.\r\n\r\nDon't do this if you want to avoid any possible spoilers!");
             }
             //SceneLoad
             if (CurrentScene == 0)
@@ -197,7 +195,7 @@ namespace Cheesenaf
             MouseY = (int)MathF.Round(mouseState.Y * ScaleY);
             MousePos = new Point(MouseX, MouseY);
             
-            if (this.IsActive || mainTitle.loading || (CurrentScene == 3 && office.loaded == false))
+            if (this.IsActive || mainTitle.loading || (CurrentScene == 3 && office.loaded == false) || CurrentScene == 4)
             {
                 if (GetKeyDown(Keys.Escape) && CurrentScene != 3 && CurrentScene != 1 && canEscape)
                     Exit();
@@ -415,11 +413,9 @@ namespace Cheesenaf
                 SixUnlocked = false,
                 Bbg = 0,
                 Username = null,
-                FullScreen = true,
                 UnlockedSecret = false,
                 splashesSeen = new bool[200],
                 SkipModMenu = false,
-                EnableDebugTogglewithTildeKey = false,
                 enabledMods = null,
             };
             Save(saveData);
