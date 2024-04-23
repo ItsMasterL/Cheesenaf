@@ -123,68 +123,188 @@ namespace Cheesenaf
                     }
                     break;
                 case 1:
-                    bbgs[0] = Content.Load<Texture2D>("BBGSim/mocha");
-                    bbgs[1] = Content.Load<Texture2D>("BBGSim/mochahappy");
-                    bbgs[2] = Content.Load<Texture2D>("BBGSim/mochaneutral");
-                    bbgs[3] = Content.Load<Texture2D>("BBGSim/mochaunhappy");
-                    voices[0] = Content.Load<SoundEffect>("Audio/Voices/mm_a");
-                    voices[1] = Content.Load<SoundEffect>("Audio/Voices/mm_i");
-                    voices[2] = Content.Load<SoundEffect>("Audio/Voices/mm_u");
-                    voices[3] = Content.Load<SoundEffect>("Audio/Voices/mm_e");
-                    voices[4] = Content.Load<SoundEffect>("Audio/Voices/mm_o");
-                    bbgDialogue = Mocha.BBGDialogue;
-                    playerDialogue = Mocha.PlayerDialogue;
-                    name = Mocha.Name;
-                    nametagColor = Mocha.Color;
-                    emotionOverlay = Mocha.OverlayExpression;
+                    foreach (string mod in Game1.Modpacks)
+                    {
+                        if (Directory.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Mocha"))
+                        {
+                            string path = "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Mocha" + Path.DirectorySeparatorChar;
+                            try
+                            {
+                                bbgs[0] = Texture2D.FromFile(Game1.GraphicsDevice, path + "base.png");
+                                bbgs[1] = Texture2D.FromFile(Game1.GraphicsDevice, path + "happy.png");
+                                bbgs[2] = Texture2D.FromFile(Game1.GraphicsDevice, path + "neutral.png");
+                                bbgs[3] = Texture2D.FromFile(Game1.GraphicsDevice, path + "unhappy.png");
+                                voices[0] = Content.Load<SoundEffect>("Audio/Voices/mm_a");
+                                voices[1] = Content.Load<SoundEffect>("Audio/Voices/mm_i");
+                                voices[2] = Content.Load<SoundEffect>("Audio/Voices/mm_u");
+                                voices[3] = Content.Load<SoundEffect>("Audio/Voices/mm_e");
+                                voices[4] = Content.Load<SoundEffect>("Audio/Voices/mm_o");
+                                string json = File.ReadAllText(path + "details.json");
+                                Custom = JsonSerializer.Deserialize<BBG>(json);
+                                bbgDialogue = Custom.BBGDialogue;
+                                playerDialogue = Custom.PlayerDialogue;
+                                name = Custom.Name;
+                                nametagColor = Custom.Color;
+                                emotionOverlay = Custom.OverlayExpression;
+                                break;
+                            }
+                            catch
+                            {
+                                bbgs[0] = Content.Load<Texture2D>("BBGSim/mocha");
+                                bbgs[1] = Content.Load<Texture2D>("BBGSim/mochahappy");
+                                bbgs[2] = Content.Load<Texture2D>("BBGSim/mochaneutral");
+                                bbgs[3] = Content.Load<Texture2D>("BBGSim/mochaunhappy");
+                                voices[0] = Content.Load<SoundEffect>("Audio/Voices/mm_a");
+                                voices[1] = Content.Load<SoundEffect>("Audio/Voices/mm_i");
+                                voices[2] = Content.Load<SoundEffect>("Audio/Voices/mm_u");
+                                voices[3] = Content.Load<SoundEffect>("Audio/Voices/mm_e");
+                                voices[4] = Content.Load<SoundEffect>("Audio/Voices/mm_o");
+                                bbgDialogue = Mocha.BBGDialogue;
+                                playerDialogue = Mocha.PlayerDialogue;
+                                name = Mocha.Name;
+                                nametagColor = Mocha.Color;
+                                emotionOverlay = Mocha.OverlayExpression;
+                            }
+                        }
+                    }
                     break;
                 case 2:
-                    bbgs[0] = Content.Load<Texture2D>("BBGSim/brett");
-                    bbgs[1] = Content.Load<Texture2D>("BBGSim/bretthappy");
-                    bbgs[2] = Content.Load<Texture2D>("BBGSim/brettneutral");
-                    bbgs[3] = Content.Load<Texture2D>("BBGSim/brettunhappy");
-                    voices[0] = Content.Load<SoundEffect>("Audio/Voices/gb_a");
-                    voices[1] = Content.Load<SoundEffect>("Audio/Voices/gb_i");
-                    voices[2] = Content.Load<SoundEffect>("Audio/Voices/gb_u");
-                    voices[3] = Content.Load<SoundEffect>("Audio/Voices/gb_e");
-                    voices[4] = Content.Load<SoundEffect>("Audio/Voices/gb_o");
-                    bbgDialogue = Brett.BBGDialogue;
-                    playerDialogue = Brett.PlayerDialogue;
-                    name = Brett.Name;
-                    nametagColor = Brett.Color;
-                    emotionOverlay = Brett.OverlayExpression;
+                    foreach (string mod in Game1.Modpacks)
+                    {
+                        if (Directory.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Brett"))
+                        {
+                            string path = "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Brett" + Path.DirectorySeparatorChar;
+                            try
+                            {
+                                bbgs[0] = Texture2D.FromFile(Game1.GraphicsDevice, path + "base.png");
+                                bbgs[1] = Texture2D.FromFile(Game1.GraphicsDevice, path + "happy.png");
+                                bbgs[2] = Texture2D.FromFile(Game1.GraphicsDevice, path + "neutral.png");
+                                bbgs[3] = Texture2D.FromFile(Game1.GraphicsDevice, path + "unhappy.png");
+                                voices[0] = Content.Load<SoundEffect>("Audio/Voices/gb_a");
+                                voices[1] = Content.Load<SoundEffect>("Audio/Voices/gb_i");
+                                voices[2] = Content.Load<SoundEffect>("Audio/Voices/gb_u");
+                                voices[3] = Content.Load<SoundEffect>("Audio/Voices/gb_e");
+                                voices[4] = Content.Load<SoundEffect>("Audio/Voices/gb_o");
+                                string json = File.ReadAllText(path + "details.json");
+                                Custom = JsonSerializer.Deserialize<BBG>(json);
+                                bbgDialogue = Custom.BBGDialogue;
+                                playerDialogue = Custom.PlayerDialogue;
+                                name = Custom.Name;
+                                nametagColor = Custom.Color;
+                                emotionOverlay = Custom.OverlayExpression;
+                                break;
+                            }
+                            catch
+                            {
+                                bbgs[0] = Content.Load<Texture2D>("BBGSim/brett");
+                                bbgs[1] = Content.Load<Texture2D>("BBGSim/bretthappy");
+                                bbgs[2] = Content.Load<Texture2D>("BBGSim/brettneutral");
+                                bbgs[3] = Content.Load<Texture2D>("BBGSim/brettunhappy");
+                                voices[0] = Content.Load<SoundEffect>("Audio/Voices/gb_a");
+                                voices[1] = Content.Load<SoundEffect>("Audio/Voices/gb_i");
+                                voices[2] = Content.Load<SoundEffect>("Audio/Voices/gb_u");
+                                voices[3] = Content.Load<SoundEffect>("Audio/Voices/gb_e");
+                                voices[4] = Content.Load<SoundEffect>("Audio/Voices/gb_o");
+                                bbgDialogue = Brett.BBGDialogue;
+                                playerDialogue = Brett.PlayerDialogue;
+                                name = Brett.Name;
+                                nametagColor = Brett.Color;
+                                emotionOverlay = Brett.OverlayExpression;
+                            }
+                        }
+                    }
                     break;
                 case 3:
-                    bbgs[0] = Content.Load<Texture2D>("BBGSim/alan");
-                    bbgs[1] = Content.Load<Texture2D>("BBGSim/alanhappy");
-                    bbgs[2] = Content.Load<Texture2D>("BBGSim/alanneutral");
-                    bbgs[3] = Content.Load<Texture2D>("BBGSim/alanunhappy");
-                    voices[0] = Content.Load<SoundEffect>("Audio/Voices/sawyer-01");
-                    voices[1] = Content.Load<SoundEffect>("Audio/Voices/sawyer-02");
-                    voices[2] = Content.Load<SoundEffect>("Audio/Voices/sawyer-03");
-                    voices[3] = Content.Load<SoundEffect>("Audio/Voices/sawyer-04");
-                    voices[4] = Content.Load<SoundEffect>("Audio/Voices/sawyer-05");
-                    bbgDialogue = Alan.BBGDialogue;
-                    playerDialogue = Alan.PlayerDialogue;
-                    name = Alan.Name;
-                    nametagColor = Alan.Color;
-                    emotionOverlay = Alan.OverlayExpression;
+                    foreach (string mod in Game1.Modpacks)
+                    {
+                        if (Directory.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Alan"))
+                        {
+                            string path = "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Alan" + Path.DirectorySeparatorChar;
+                            try
+                            {
+                                bbgs[0] = Texture2D.FromFile(Game1.GraphicsDevice, path + "base.png");
+                                bbgs[1] = Texture2D.FromFile(Game1.GraphicsDevice, path + "happy.png");
+                                bbgs[2] = Texture2D.FromFile(Game1.GraphicsDevice, path + "neutral.png");
+                                bbgs[3] = Texture2D.FromFile(Game1.GraphicsDevice, path + "unhappy.png");
+                                voices[0] = Content.Load<SoundEffect>("Audio/Voices/sawyer-01");
+                                voices[1] = Content.Load<SoundEffect>("Audio/Voices/sawyer-02");
+                                voices[2] = Content.Load<SoundEffect>("Audio/Voices/sawyer-03");
+                                voices[3] = Content.Load<SoundEffect>("Audio/Voices/sawyer-04");
+                                voices[4] = Content.Load<SoundEffect>("Audio/Voices/sawyer-05");
+                                string json = File.ReadAllText(path + "details.json");
+                                Custom = JsonSerializer.Deserialize<BBG>(json);
+                                bbgDialogue = Custom.BBGDialogue;
+                                playerDialogue = Custom.PlayerDialogue;
+                                name = Custom.Name;
+                                nametagColor = Custom.Color;
+                                emotionOverlay = Custom.OverlayExpression;
+                                break;
+                            }
+                            catch
+                            {
+                                bbgs[0] = Content.Load<Texture2D>("BBGSim/alan");
+                                bbgs[1] = Content.Load<Texture2D>("BBGSim/alanhappy");
+                                bbgs[2] = Content.Load<Texture2D>("BBGSim/alanneutral");
+                                bbgs[3] = Content.Load<Texture2D>("BBGSim/alanunhappy");
+                                voices[0] = Content.Load<SoundEffect>("Audio/Voices/sawyer-01");
+                                voices[1] = Content.Load<SoundEffect>("Audio/Voices/sawyer-02");
+                                voices[2] = Content.Load<SoundEffect>("Audio/Voices/sawyer-03");
+                                voices[3] = Content.Load<SoundEffect>("Audio/Voices/sawyer-04");
+                                voices[4] = Content.Load<SoundEffect>("Audio/Voices/sawyer-05");
+                                bbgDialogue = Alan.BBGDialogue;
+                                playerDialogue = Alan.PlayerDialogue;
+                                name = Alan.Name;
+                                nametagColor = Alan.Color;
+                                emotionOverlay = Alan.OverlayExpression;
+                            }
+                        }
+                    }
                     break;
                 case 4:
-                    bbgs[0] = Content.Load<Texture2D>("BBGSim/berry");
-                    bbgs[1] = Content.Load<Texture2D>("BBGSim/berryhappy");
-                    bbgs[2] = Content.Load<Texture2D>("BBGSim/berryneutral");
-                    bbgs[3] = Content.Load<Texture2D>("BBGSim/berryunhappy");
-                    voices[0] = Content.Load<SoundEffect>("Audio/Voices/sawyer-01");
-                    voices[1] = Content.Load<SoundEffect>("Audio/Voices/sawyer-02");
-                    voices[2] = Content.Load<SoundEffect>("Audio/Voices/sawyer-03");
-                    voices[3] = Content.Load<SoundEffect>("Audio/Voices/sawyer-04");
-                    voices[4] = Content.Load<SoundEffect>("Audio/Voices/sawyer-05");
-                    bbgDialogue = Berry.BBGDialogue;
-                    playerDialogue = Berry.PlayerDialogue;
-                    name = Berry.Name;
-                    nametagColor = Berry.Color;
-                    emotionOverlay = Berry.OverlayExpression;
+                    foreach (string mod in Game1.Modpacks)
+                    {
+                        if (Directory.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Berry"))
+                        {
+                            string path = "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Berry" + Path.DirectorySeparatorChar;
+                            try
+                            {
+                                bbgs[0] = Texture2D.FromFile(Game1.GraphicsDevice, path + "base.png");
+                                bbgs[1] = Texture2D.FromFile(Game1.GraphicsDevice, path + "happy.png");
+                                bbgs[2] = Texture2D.FromFile(Game1.GraphicsDevice, path + "neutral.png");
+                                bbgs[3] = Texture2D.FromFile(Game1.GraphicsDevice, path + "unhappy.png");
+                                voices[0] = Content.Load<SoundEffect>("Audio/Voices/sawyer-01");
+                                voices[1] = Content.Load<SoundEffect>("Audio/Voices/sawyer-02");
+                                voices[2] = Content.Load<SoundEffect>("Audio/Voices/sawyer-03");
+                                voices[3] = Content.Load<SoundEffect>("Audio/Voices/sawyer-04");
+                                voices[4] = Content.Load<SoundEffect>("Audio/Voices/sawyer-05");
+                                string json = File.ReadAllText(path + "details.json");
+                                Custom = JsonSerializer.Deserialize<BBG>(json);
+                                bbgDialogue = Custom.BBGDialogue;
+                                playerDialogue = Custom.PlayerDialogue;
+                                name = Custom.Name;
+                                nametagColor = Custom.Color;
+                                emotionOverlay = Custom.OverlayExpression;
+                                break;
+                            }
+                            catch
+                            {
+                                bbgs[0] = Content.Load<Texture2D>("BBGSim/berry");
+                                bbgs[1] = Content.Load<Texture2D>("BBGSim/berryhappy");
+                                bbgs[2] = Content.Load<Texture2D>("BBGSim/berryneutral");
+                                bbgs[3] = Content.Load<Texture2D>("BBGSim/berryunhappy");
+                                voices[0] = Content.Load<SoundEffect>("Audio/Voices/sawyer-01");
+                                voices[1] = Content.Load<SoundEffect>("Audio/Voices/sawyer-02");
+                                voices[2] = Content.Load<SoundEffect>("Audio/Voices/sawyer-03");
+                                voices[3] = Content.Load<SoundEffect>("Audio/Voices/sawyer-04");
+                                voices[4] = Content.Load<SoundEffect>("Audio/Voices/sawyer-05");
+                                bbgDialogue = Berry.BBGDialogue;
+                                playerDialogue = Berry.PlayerDialogue;
+                                name = Berry.Name;
+                                nametagColor = Berry.Color;
+                                emotionOverlay = Berry.OverlayExpression;
+                            }
+                        }
+                    }
                     break;
                 case 5:
                     foreach (string mod in Game1.Modpacks)
