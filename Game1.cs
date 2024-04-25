@@ -67,7 +67,8 @@ namespace Cheesenaf
         public SpriteFont PixelFont;
         public SpriteFont BBGFont;
 
-        public List<string> Modpacks;
+        public static List<string> Modpacks;
+        public static List<string> BBGs;
 
         // Initialization
         RenderTarget2D _nativeRenderTarget;
@@ -128,12 +129,12 @@ namespace Cheesenaf
             cheesenafTitle = new CheesenafTitle();
             modmenu = new Modmenu();
             Modpacks = new List<string>();
+            BBGs = new List<string>();
             _nativeRenderTarget = new RenderTarget2D(GraphicsDevice, 1920, 1080);
             //Save Data
             if (File.Exists(SAVEPATH))
             {
                 saveData = LoadSave();
-                saveData.Bbg = Math.Clamp(saveData.Bbg, 0, 4);
                 saveData.Night = Math.Clamp(saveData.Night, 1, 5);
                 if (saveData.AltTitle)
                 {
@@ -147,6 +148,13 @@ namespace Cheesenaf
                         if (Directory.Exists("Mods" + Path.DirectorySeparatorChar + pack) && !Modpacks.Contains(pack))
                         {
                             Modpacks.Add(pack);
+                            foreach (string bbg in Directory.GetDirectories("Mods" + Path.DirectorySeparatorChar + pack + Path.DirectorySeparatorChar + "bbgs"))
+                            {
+                                if (bbg != "Syowen" && bbg != "Mocha" && bbg != "Brett" && bbg != "Alan" && bbg != "Berry")
+                                {
+                                    BBGs.Add(bbg);
+                                }
+                            }
                         }
                     }
                     saveData.enabledMods = Modpacks.ToArray();

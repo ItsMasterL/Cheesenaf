@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using static Cheesenaf.Modmenu;
 
 namespace Cheesenaf
 {
@@ -306,9 +307,33 @@ namespace Cheesenaf
                     if (confirm.Contains(Game1.MouseX, Game1.MouseY) && Game1.GetMouseDown())
                     {
                         Game1.saveData.enabledMods = Game1.Modpacks.ToArray();
+
+                        if (Game1.saveData.enabledMods != null)
+                        {
+                            Game1.BBGs = new List<string>();
+                            foreach (string pack in Game1.saveData.enabledMods)
+                            {
+                                if (Directory.Exists("Mods" + Path.DirectorySeparatorChar + pack))
+                                {
+                                    foreach (string bbg in Directory.GetDirectories("Mods" + Path.DirectorySeparatorChar + pack + Path.DirectorySeparatorChar + "bbgs"))
+                                    {
+                                        if (bbg != "Syowen" && bbg != "Mocha" && bbg != "Brett" && bbg != "Alan" && bbg != "Berry")
+                                        {
+                                            Game1.BBGs.Add(bbg);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                         Game1.Save(Game1.saveData);
                         if (music != null)
                             music.Stop();
+
+                        if (Game1.saveData.Bbg > 4 + Game1.BBGs.Count)
+                        {
+                            Game1.saveData.Bbg = 0;
+                        }
+
                         if (Game1.saveData.AltTitle)
                         {
                             Game1.ChangeScene(2);
@@ -326,9 +351,16 @@ namespace Cheesenaf
                     {
                         Game1.saveData.enabledMods = null;
                         Game1.Modpacks = new List<string>();
+                        Game1.BBGs = new List<string>();
                         Game1.Save(Game1.saveData);
                         if (music != null)
                             music.Stop();
+
+                        if (Game1.saveData.Bbg > 4 + Game1.BBGs.Count)
+                        {
+                            Game1.saveData.Bbg = 0;
+                        }
+
                         if (Game1.saveData.AltTitle)
                         {
                             Game1.ChangeScene(2);
@@ -376,6 +408,8 @@ namespace Cheesenaf
                 _spriteBatch.DrawString(Game1.PixelFont, "v" + modpack.ModVersion + " for game version " + modpack.GameVersion, new Vector2(200, 190 + yOffset + LeftScroll), modpack.GameVersion == Game1.Version ? Color.Gray : new Color(255, 85, 85));
                 _spriteBatch.DrawString(Game1.PixelFont, "T", new Vector2(200, 210 + yOffset + LeftScroll), modpack.TextMod ? Color.Cyan : Color.Black);
                 _spriteBatch.DrawString(Game1.PixelFont, "B", new Vector2(215, 210 + yOffset + LeftScroll), modpack.BBGSimMod ? Color.Magenta : Color.Black);
+                _spriteBatch.DrawString(Game1.PixelFont, "I", new Vector2(230, 210 + yOffset + LeftScroll), modpack.ImageMod ? Color.Lime : Color.Black);
+                _spriteBatch.DrawString(Game1.PixelFont, "A", new Vector2(245, 210 + yOffset + LeftScroll), modpack.AudioMod ? Color.Gold : Color.Black);
                 yOffset += 150;
 
             }
@@ -395,6 +429,8 @@ namespace Cheesenaf
                 _spriteBatch.DrawString(Game1.PixelFont, "v" + modpack.ModVersion + " for game version " + modpack.GameVersion, new Vector2(1200, 190 + yOffset + RightScroll), modpack.GameVersion == Game1.Version ? Color.Gray : new Color(255, 85, 85));
                 _spriteBatch.DrawString(Game1.PixelFont, "T", new Vector2(1200, 210 + yOffset + LeftScroll), modpack.TextMod ? Color.Cyan : Color.Black);
                 _spriteBatch.DrawString(Game1.PixelFont, "B", new Vector2(1215, 210 + yOffset + LeftScroll), modpack.BBGSimMod ? Color.Magenta : Color.Black);
+                _spriteBatch.DrawString(Game1.PixelFont, "I", new Vector2(1230, 210 + yOffset + LeftScroll), modpack.ImageMod ? Color.Lime : Color.Black);
+                _spriteBatch.DrawString(Game1.PixelFont, "A", new Vector2(1245, 210 + yOffset + LeftScroll), modpack.AudioMod ? Color.Gold : Color.Black);
                 yOffset += 150;
             }
             _spriteBatch.Draw(bg, new Rectangle(0, 0, 1920, 80), new Rectangle(0, 0, 1920, 80), Color.White);
@@ -583,13 +619,23 @@ namespace Cheesenaf
                     }
                     if (File.Exists(dir + Path.DirectorySeparatorChar + "icon.png"))
                     {
-                        modpack.Icon = Texture2D.FromFile(Game1.GraphicsDevice, dir + Path.DirectorySeparatorChar + "icon.png");
+                        FileInfo fi = new FileInfo(dir + Path.DirectorySeparatorChar + "icon.png");
+                        if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                            modpack.Icon = Texture2D.FromFile(Game1.GraphicsDevice, dir + Path.DirectorySeparatorChar + "icon.png");
                     }
                     if (File.Exists(dir + Path.DirectorySeparatorChar + "text" + Path.DirectorySeparatorChar + "splash.json"))
                     {
                         modpack.TextMod = true;
                     }
                     if (Directory.Exists(dir + Path.DirectorySeparatorChar + "bbgs"))
+                    {
+                        modpack.BBGSimMod = true;
+                    }
+                    if (Directory.Exists(dir + Path.DirectorySeparatorChar + "textures"))
+                    {
+                        modpack.BBGSimMod = true;
+                    }
+                    if (Directory.Exists(dir + Path.DirectorySeparatorChar + "audio"))
                     {
                         modpack.BBGSimMod = true;
                     }

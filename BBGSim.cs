@@ -74,29 +74,73 @@ namespace Cheesenaf
         {
             bbgs = new Texture2D[4];
             voices = new SoundEffect[5];
+            string path;
             switch (Game1.saveData.Bbg)
             {
-                default:
+                case 0:
                     foreach (string mod in Game1.Modpacks)
                     {
                         if (Directory.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Syowen"))
                         {
-                            string path = "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Syowen" + Path.DirectorySeparatorChar;
+                            path = "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Syowen" + Path.DirectorySeparatorChar;
                             try
                             {
-                                bbgs[0] = Texture2D.FromFile(Game1.GraphicsDevice, path + "base.png");
-                                bbgs[1] = Texture2D.FromFile(Game1.GraphicsDevice, path + "happy.png");
-                                bbgs[2] = Texture2D.FromFile(Game1.GraphicsDevice, path + "neutral.png");
-                                bbgs[3] = Texture2D.FromFile(Game1.GraphicsDevice, path + "unhappy.png");
-                                voices[0] = Content.Load<SoundEffect>("Audio/Voices/sb_a");
-                                voices[1] = Content.Load<SoundEffect>("Audio/Voices/sb_i");
-                                voices[2] = Content.Load<SoundEffect>("Audio/Voices/sb_u");
-                                voices[3] = Content.Load<SoundEffect>("Audio/Voices/sb_e");
-                                voices[4] = Content.Load<SoundEffect>("Audio/Voices/sb_o");
+                                FileInfo fi = new FileInfo(path + "base.png");
+                                if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    bbgs[0] = Texture2D.FromFile(Game1.GraphicsDevice, path + "base.png");
+                                else
+                                    bbgs[0] = Content.Load<Texture2D>("BBGSim/syowen");
+                                fi = new FileInfo(path + "happy.png");
+                                if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    bbgs[1] = Texture2D.FromFile(Game1.GraphicsDevice, path + "happy.png");
+                                else
+                                    bbgs[1] = Content.Load<Texture2D>("BBGSim/syowenhappy");
+                                fi = new FileInfo(path + "neutral.png");
+                                if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    bbgs[2] = Texture2D.FromFile(Game1.GraphicsDevice, path + "neutral.png");
+                                else
+                                    bbgs[2] = Content.Load<Texture2D>("BBGSim/syowenneutral");
+                                fi = new FileInfo(path + "unhappy.png");
+                                if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    bbgs[3] = Texture2D.FromFile(Game1.GraphicsDevice, path + "unhappy.png");
+                                else
+                                    bbgs[3] = Content.Load<Texture2D>("BBGSim/syowenunhappy");
+                                try
+                                {
+                                    fi = new FileInfo(path + "a.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[0] = SoundEffect.FromFile(path + "a.wav");
+                                    fi = new FileInfo(path + "i.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[1] = SoundEffect.FromFile(path + "i.wav");
+                                    fi = new FileInfo(path + "u.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[2] = SoundEffect.FromFile(path + "u.wav");
+                                    fi = new FileInfo(path + "e.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[3] = SoundEffect.FromFile(path + "e.wav");
+                                    fi = new FileInfo(path + "o.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[4] = SoundEffect.FromFile(path + "o.wav");
+                                }
+                                catch
+                                {
+                                    voices[0] = Content.Load<SoundEffect>("Audio/Voices/sb_a");
+                                    voices[1] = Content.Load<SoundEffect>("Audio/Voices/sb_i");
+                                    voices[2] = Content.Load<SoundEffect>("Audio/Voices/sb_u");
+                                    voices[3] = Content.Load<SoundEffect>("Audio/Voices/sb_e");
+                                    voices[4] = Content.Load<SoundEffect>("Audio/Voices/sb_o");
+                                }
                                 string json = File.ReadAllText(path + "details.json");
                                 Custom = JsonSerializer.Deserialize<BBG>(json);
-                                bbgDialogue = Custom.BBGDialogue;
-                                playerDialogue = Custom.PlayerDialogue;
+                                if (Custom.BBGDialogue.Count == Syowen.BBGDialogue.Count)
+                                    bbgDialogue = Custom.BBGDialogue;
+                                else
+                                    bbgDialogue = Syowen.BBGDialogue;
+                                if (Custom.PlayerDialogue.Count == Syowen.PlayerDialogue.Count)
+                                    playerDialogue = Custom.PlayerDialogue;
+                                else
+                                    playerDialogue = Syowen.PlayerDialogue;
                                 name = Custom.Name;
                                 nametagColor = Custom.Color;
                                 emotionOverlay = Custom.OverlayExpression;
@@ -120,6 +164,23 @@ namespace Cheesenaf
                                 emotionOverlay = Syowen.OverlayExpression;
                             }
                         }
+                        else
+                        {
+                            bbgs[0] = Content.Load<Texture2D>("BBGSim/syowen");
+                            bbgs[1] = Content.Load<Texture2D>("BBGSim/syowenhappy");
+                            bbgs[2] = Content.Load<Texture2D>("BBGSim/syowenneutral");
+                            bbgs[3] = Content.Load<Texture2D>("BBGSim/syowenunhappy");
+                            voices[0] = Content.Load<SoundEffect>("Audio/Voices/sb_a");
+                            voices[1] = Content.Load<SoundEffect>("Audio/Voices/sb_i");
+                            voices[2] = Content.Load<SoundEffect>("Audio/Voices/sb_u");
+                            voices[3] = Content.Load<SoundEffect>("Audio/Voices/sb_e");
+                            voices[4] = Content.Load<SoundEffect>("Audio/Voices/sb_o");
+                            bbgDialogue = Syowen.BBGDialogue;
+                            playerDialogue = Syowen.PlayerDialogue;
+                            name = Syowen.Name;
+                            nametagColor = Syowen.Color;
+                            emotionOverlay = Syowen.OverlayExpression;
+                        }
                     }
                     break;
                 case 1:
@@ -127,22 +188,66 @@ namespace Cheesenaf
                     {
                         if (Directory.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Mocha"))
                         {
-                            string path = "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Mocha" + Path.DirectorySeparatorChar;
+                            path = "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Mocha" + Path.DirectorySeparatorChar;
                             try
                             {
-                                bbgs[0] = Texture2D.FromFile(Game1.GraphicsDevice, path + "base.png");
-                                bbgs[1] = Texture2D.FromFile(Game1.GraphicsDevice, path + "happy.png");
-                                bbgs[2] = Texture2D.FromFile(Game1.GraphicsDevice, path + "neutral.png");
-                                bbgs[3] = Texture2D.FromFile(Game1.GraphicsDevice, path + "unhappy.png");
-                                voices[0] = Content.Load<SoundEffect>("Audio/Voices/mm_a");
-                                voices[1] = Content.Load<SoundEffect>("Audio/Voices/mm_i");
-                                voices[2] = Content.Load<SoundEffect>("Audio/Voices/mm_u");
-                                voices[3] = Content.Load<SoundEffect>("Audio/Voices/mm_e");
-                                voices[4] = Content.Load<SoundEffect>("Audio/Voices/mm_o");
+                                FileInfo fi = new FileInfo(path + "base.png");
+                                if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    bbgs[0] = Texture2D.FromFile(Game1.GraphicsDevice, path + "base.png");
+                                else
+                                    bbgs[0] = Content.Load<Texture2D>("BBGSim/mocha");
+                                fi = new FileInfo(path + "happy.png");
+                                if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    bbgs[1] = Texture2D.FromFile(Game1.GraphicsDevice, path + "happy.png");
+                                else
+                                    bbgs[1] = Content.Load<Texture2D>("BBGSim/mochahappy");
+                                fi = new FileInfo(path + "neutral.png");
+                                if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    bbgs[2] = Texture2D.FromFile(Game1.GraphicsDevice, path + "neutral.png");
+                                else
+                                    bbgs[2] = Content.Load<Texture2D>("BBGSim/mochaneutral");
+                                fi = new FileInfo(path + "unhappy.png");
+                                if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    bbgs[3] = Texture2D.FromFile(Game1.GraphicsDevice, path + "unhappy.png");
+                                else
+                                    bbgs[3] = Content.Load<Texture2D>("BBGSim/mochaunhappy");
+
+                                try
+                                {
+                                    fi = new FileInfo(path + "a.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[0] = SoundEffect.FromFile(path + "a.wav");
+                                    fi = new FileInfo(path + "i.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[1] = SoundEffect.FromFile(path + "i.wav");
+                                    fi = new FileInfo(path + "u.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[2] = SoundEffect.FromFile(path + "u.wav");
+                                    fi = new FileInfo(path + "e.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[3] = SoundEffect.FromFile(path + "e.wav");
+                                    fi = new FileInfo(path + "o.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[4] = SoundEffect.FromFile(path + "o.wav");
+                                }
+                                catch
+                                {
+                                    voices[0] = Content.Load<SoundEffect>("Audio/Voices/mm_a");
+                                    voices[1] = Content.Load<SoundEffect>("Audio/Voices/mm_i");
+                                    voices[2] = Content.Load<SoundEffect>("Audio/Voices/mm_u");
+                                    voices[3] = Content.Load<SoundEffect>("Audio/Voices/mm_e");
+                                    voices[4] = Content.Load<SoundEffect>("Audio/Voices/mm_o");
+                                }
                                 string json = File.ReadAllText(path + "details.json");
                                 Custom = JsonSerializer.Deserialize<BBG>(json);
-                                bbgDialogue = Custom.BBGDialogue;
-                                playerDialogue = Custom.PlayerDialogue;
+                                if (Custom.BBGDialogue.Count == Mocha.BBGDialogue.Count)
+                                    bbgDialogue = Custom.BBGDialogue;
+                                else
+                                    bbgDialogue = Mocha.BBGDialogue;
+                                if (Custom.PlayerDialogue.Count == Mocha.PlayerDialogue.Count)
+                                    playerDialogue = Custom.PlayerDialogue;
+                                else
+                                    playerDialogue = Mocha.PlayerDialogue;
                                 name = Custom.Name;
                                 nametagColor = Custom.Color;
                                 emotionOverlay = Custom.OverlayExpression;
@@ -166,6 +271,23 @@ namespace Cheesenaf
                                 emotionOverlay = Mocha.OverlayExpression;
                             }
                         }
+                        else
+                        {
+                            bbgs[0] = Content.Load<Texture2D>("BBGSim/mocha");
+                            bbgs[1] = Content.Load<Texture2D>("BBGSim/mochahappy");
+                            bbgs[2] = Content.Load<Texture2D>("BBGSim/mochaneutral");
+                            bbgs[3] = Content.Load<Texture2D>("BBGSim/mochaunhappy");
+                            voices[0] = Content.Load<SoundEffect>("Audio/Voices/mm_a");
+                            voices[1] = Content.Load<SoundEffect>("Audio/Voices/mm_i");
+                            voices[2] = Content.Load<SoundEffect>("Audio/Voices/mm_u");
+                            voices[3] = Content.Load<SoundEffect>("Audio/Voices/mm_e");
+                            voices[4] = Content.Load<SoundEffect>("Audio/Voices/mm_o");
+                            bbgDialogue = Mocha.BBGDialogue;
+                            playerDialogue = Mocha.PlayerDialogue;
+                            name = Mocha.Name;
+                            nametagColor = Mocha.Color;
+                            emotionOverlay = Mocha.OverlayExpression;
+                        }
                     }
                     break;
                 case 2:
@@ -173,22 +295,66 @@ namespace Cheesenaf
                     {
                         if (Directory.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Brett"))
                         {
-                            string path = "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Brett" + Path.DirectorySeparatorChar;
+                            path = "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Brett" + Path.DirectorySeparatorChar;
                             try
                             {
-                                bbgs[0] = Texture2D.FromFile(Game1.GraphicsDevice, path + "base.png");
-                                bbgs[1] = Texture2D.FromFile(Game1.GraphicsDevice, path + "happy.png");
-                                bbgs[2] = Texture2D.FromFile(Game1.GraphicsDevice, path + "neutral.png");
-                                bbgs[3] = Texture2D.FromFile(Game1.GraphicsDevice, path + "unhappy.png");
-                                voices[0] = Content.Load<SoundEffect>("Audio/Voices/gb_a");
-                                voices[1] = Content.Load<SoundEffect>("Audio/Voices/gb_i");
-                                voices[2] = Content.Load<SoundEffect>("Audio/Voices/gb_u");
-                                voices[3] = Content.Load<SoundEffect>("Audio/Voices/gb_e");
-                                voices[4] = Content.Load<SoundEffect>("Audio/Voices/gb_o");
+                                FileInfo fi = new FileInfo(path + "base.png");
+                                if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    bbgs[0] = Texture2D.FromFile(Game1.GraphicsDevice, path + "base.png");
+                                else
+                                    bbgs[0] = Content.Load<Texture2D>("BBGSim/brett");
+                                fi = new FileInfo(path + "happy.png");
+                                if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    bbgs[1] = Texture2D.FromFile(Game1.GraphicsDevice, path + "happy.png");
+                                else
+                                    bbgs[1] = Content.Load<Texture2D>("BBGSim/bretthappy");
+                                fi = new FileInfo(path + "neutral.png");
+                                if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    bbgs[2] = Texture2D.FromFile(Game1.GraphicsDevice, path + "neutral.png");
+                                else
+                                    bbgs[2] = Content.Load<Texture2D>("BBGSim/brettneutral");
+                                fi = new FileInfo(path + "unhappy.png");
+                                if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    bbgs[3] = Texture2D.FromFile(Game1.GraphicsDevice, path + "unhappy.png");
+                                else
+                                    bbgs[3] = Content.Load<Texture2D>("BBGSim/brettunhappy");
+
+                                try
+                                {
+                                    fi = new FileInfo(path + "a.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[0] = SoundEffect.FromFile(path + "a.wav");
+                                    fi = new FileInfo(path + "i.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[1] = SoundEffect.FromFile(path + "i.wav");
+                                    fi = new FileInfo(path + "u.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[2] = SoundEffect.FromFile(path + "u.wav");
+                                    fi = new FileInfo(path + "e.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[3] = SoundEffect.FromFile(path + "e.wav");
+                                    fi = new FileInfo(path + "o.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[4] = SoundEffect.FromFile(path + "o.wav");
+                                }
+                                catch
+                                {
+                                    voices[0] = Content.Load<SoundEffect>("Audio/Voices/gb_a");
+                                    voices[1] = Content.Load<SoundEffect>("Audio/Voices/gb_i");
+                                    voices[2] = Content.Load<SoundEffect>("Audio/Voices/gb_u");
+                                    voices[3] = Content.Load<SoundEffect>("Audio/Voices/gb_e");
+                                    voices[4] = Content.Load<SoundEffect>("Audio/Voices/gb_o");
+                                }
                                 string json = File.ReadAllText(path + "details.json");
                                 Custom = JsonSerializer.Deserialize<BBG>(json);
-                                bbgDialogue = Custom.BBGDialogue;
-                                playerDialogue = Custom.PlayerDialogue;
+                                if (Custom.BBGDialogue.Count == Brett.BBGDialogue.Count)
+                                    bbgDialogue = Custom.BBGDialogue;
+                                else
+                                    bbgDialogue = Brett.BBGDialogue;
+                                if (Custom.PlayerDialogue.Count == Brett.PlayerDialogue.Count)
+                                    playerDialogue = Custom.PlayerDialogue;
+                                else
+                                    playerDialogue = Brett.PlayerDialogue;
                                 name = Custom.Name;
                                 nametagColor = Custom.Color;
                                 emotionOverlay = Custom.OverlayExpression;
@@ -212,6 +378,23 @@ namespace Cheesenaf
                                 emotionOverlay = Brett.OverlayExpression;
                             }
                         }
+                        else
+                        {
+                            bbgs[0] = Content.Load<Texture2D>("BBGSim/brett");
+                            bbgs[1] = Content.Load<Texture2D>("BBGSim/bretthappy");
+                            bbgs[2] = Content.Load<Texture2D>("BBGSim/brettneutral");
+                            bbgs[3] = Content.Load<Texture2D>("BBGSim/brettunhappy");
+                            voices[0] = Content.Load<SoundEffect>("Audio/Voices/gb_a");
+                            voices[1] = Content.Load<SoundEffect>("Audio/Voices/gb_i");
+                            voices[2] = Content.Load<SoundEffect>("Audio/Voices/gb_u");
+                            voices[3] = Content.Load<SoundEffect>("Audio/Voices/gb_e");
+                            voices[4] = Content.Load<SoundEffect>("Audio/Voices/gb_o");
+                            bbgDialogue = Brett.BBGDialogue;
+                            playerDialogue = Brett.PlayerDialogue;
+                            name = Brett.Name;
+                            nametagColor = Brett.Color;
+                            emotionOverlay = Brett.OverlayExpression;
+                        }
                     }
                     break;
                 case 3:
@@ -219,22 +402,66 @@ namespace Cheesenaf
                     {
                         if (Directory.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Alan"))
                         {
-                            string path = "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Alan" + Path.DirectorySeparatorChar;
+                            path = "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Alan" + Path.DirectorySeparatorChar;
                             try
                             {
-                                bbgs[0] = Texture2D.FromFile(Game1.GraphicsDevice, path + "base.png");
-                                bbgs[1] = Texture2D.FromFile(Game1.GraphicsDevice, path + "happy.png");
-                                bbgs[2] = Texture2D.FromFile(Game1.GraphicsDevice, path + "neutral.png");
-                                bbgs[3] = Texture2D.FromFile(Game1.GraphicsDevice, path + "unhappy.png");
-                                voices[0] = Content.Load<SoundEffect>("Audio/Voices/sawyer-01");
-                                voices[1] = Content.Load<SoundEffect>("Audio/Voices/sawyer-02");
-                                voices[2] = Content.Load<SoundEffect>("Audio/Voices/sawyer-03");
-                                voices[3] = Content.Load<SoundEffect>("Audio/Voices/sawyer-04");
-                                voices[4] = Content.Load<SoundEffect>("Audio/Voices/sawyer-05");
+                                FileInfo fi = new FileInfo(path + "base.png");
+                                if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    bbgs[0] = Texture2D.FromFile(Game1.GraphicsDevice, path + "base.png");
+                                else
+                                    bbgs[0] = Content.Load<Texture2D>("BBGSim/alan");
+                                fi = new FileInfo(path + "happy.png");
+                                if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    bbgs[1] = Texture2D.FromFile(Game1.GraphicsDevice, path + "happy.png");
+                                else
+                                    bbgs[1] = Content.Load<Texture2D>("BBGSim/alanhappy");
+                                fi = new FileInfo(path + "neutral.png");
+                                if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    bbgs[2] = Texture2D.FromFile(Game1.GraphicsDevice, path + "neutral.png");
+                                else
+                                    bbgs[2] = Content.Load<Texture2D>("BBGSim/alanneutral");
+                                fi = new FileInfo(path + "unhappy.png");
+                                if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    bbgs[3] = Texture2D.FromFile(Game1.GraphicsDevice, path + "unhappy.png");
+                                else
+                                    bbgs[3] = Content.Load<Texture2D>("BBGSim/alanunhappy");
+
+                                try
+                                {
+                                    fi = new FileInfo(path + "a.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[0] = SoundEffect.FromFile(path + "a.wav");
+                                    fi = new FileInfo(path + "i.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[1] = SoundEffect.FromFile(path + "i.wav");
+                                    fi = new FileInfo(path + "u.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[2] = SoundEffect.FromFile(path + "u.wav");
+                                    fi = new FileInfo(path + "e.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[3] = SoundEffect.FromFile(path + "e.wav");
+                                    fi = new FileInfo(path + "o.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[4] = SoundEffect.FromFile(path + "o.wav");
+                                }
+                                catch
+                                {
+                                    voices[0] = Content.Load<SoundEffect>("Audio/Voices/sawyer-01");
+                                    voices[1] = Content.Load<SoundEffect>("Audio/Voices/sawyer-02");
+                                    voices[2] = Content.Load<SoundEffect>("Audio/Voices/sawyer-03");
+                                    voices[3] = Content.Load<SoundEffect>("Audio/Voices/sawyer-04");
+                                    voices[4] = Content.Load<SoundEffect>("Audio/Voices/sawyer-05");
+                                }
                                 string json = File.ReadAllText(path + "details.json");
                                 Custom = JsonSerializer.Deserialize<BBG>(json);
-                                bbgDialogue = Custom.BBGDialogue;
-                                playerDialogue = Custom.PlayerDialogue;
+                                if (Custom.BBGDialogue.Count == Alan.BBGDialogue.Count)
+                                    bbgDialogue = Custom.BBGDialogue;
+                                else
+                                    bbgDialogue = Alan.BBGDialogue;
+                                if (Custom.PlayerDialogue.Count == Alan.PlayerDialogue.Count)
+                                    playerDialogue = Custom.PlayerDialogue;
+                                else
+                                    playerDialogue = Alan.PlayerDialogue;
                                 name = Custom.Name;
                                 nametagColor = Custom.Color;
                                 emotionOverlay = Custom.OverlayExpression;
@@ -258,6 +485,23 @@ namespace Cheesenaf
                                 emotionOverlay = Alan.OverlayExpression;
                             }
                         }
+                        else
+                        {
+                            bbgs[0] = Content.Load<Texture2D>("BBGSim/alan");
+                            bbgs[1] = Content.Load<Texture2D>("BBGSim/alanhappy");
+                            bbgs[2] = Content.Load<Texture2D>("BBGSim/alanneutral");
+                            bbgs[3] = Content.Load<Texture2D>("BBGSim/alanunhappy");
+                            voices[0] = Content.Load<SoundEffect>("Audio/Voices/sawyer-01");
+                            voices[1] = Content.Load<SoundEffect>("Audio/Voices/sawyer-02");
+                            voices[2] = Content.Load<SoundEffect>("Audio/Voices/sawyer-03");
+                            voices[3] = Content.Load<SoundEffect>("Audio/Voices/sawyer-04");
+                            voices[4] = Content.Load<SoundEffect>("Audio/Voices/sawyer-05");
+                            bbgDialogue = Alan.BBGDialogue;
+                            playerDialogue = Alan.PlayerDialogue;
+                            name = Alan.Name;
+                            nametagColor = Alan.Color;
+                            emotionOverlay = Alan.OverlayExpression;
+                        }
                     }
                     break;
                 case 4:
@@ -265,22 +509,66 @@ namespace Cheesenaf
                     {
                         if (Directory.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Berry"))
                         {
-                            string path = "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Berry" + Path.DirectorySeparatorChar;
+                            path = "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Berry" + Path.DirectorySeparatorChar;
                             try
                             {
-                                bbgs[0] = Texture2D.FromFile(Game1.GraphicsDevice, path + "base.png");
-                                bbgs[1] = Texture2D.FromFile(Game1.GraphicsDevice, path + "happy.png");
-                                bbgs[2] = Texture2D.FromFile(Game1.GraphicsDevice, path + "neutral.png");
-                                bbgs[3] = Texture2D.FromFile(Game1.GraphicsDevice, path + "unhappy.png");
-                                voices[0] = Content.Load<SoundEffect>("Audio/Voices/sawyer-01");
-                                voices[1] = Content.Load<SoundEffect>("Audio/Voices/sawyer-02");
-                                voices[2] = Content.Load<SoundEffect>("Audio/Voices/sawyer-03");
-                                voices[3] = Content.Load<SoundEffect>("Audio/Voices/sawyer-04");
-                                voices[4] = Content.Load<SoundEffect>("Audio/Voices/sawyer-05");
+                                FileInfo fi = new FileInfo(path + "base.png");
+                                if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    bbgs[0] = Texture2D.FromFile(Game1.GraphicsDevice, path + "base.png");
+                                else
+                                    bbgs[0] = Content.Load<Texture2D>("BBGSim/berry");
+                                fi = new FileInfo(path + "happy.png");
+                                if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    bbgs[1] = Texture2D.FromFile(Game1.GraphicsDevice, path + "happy.png");
+                                else
+                                    bbgs[1] = Content.Load<Texture2D>("BBGSim/berryhappy");
+                                fi = new FileInfo(path + "neutral.png");
+                                if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    bbgs[2] = Texture2D.FromFile(Game1.GraphicsDevice, path + "neutral.png");
+                                else
+                                    bbgs[2] = Content.Load<Texture2D>("BBGSim/berryneutral");
+                                fi = new FileInfo(path + "unhappy.png");
+                                if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    bbgs[3] = Texture2D.FromFile(Game1.GraphicsDevice, path + "unhappy.png");
+                                else
+                                    bbgs[3] = Content.Load<Texture2D>("BBGSim/berryunhappy");
+
+                                try
+                                {
+                                    fi = new FileInfo(path + "a.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[0] = SoundEffect.FromFile(path + "a.wav");
+                                    fi = new FileInfo(path + "i.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[1] = SoundEffect.FromFile(path + "i.wav");
+                                    fi = new FileInfo(path + "u.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[2] = SoundEffect.FromFile(path + "u.wav");
+                                    fi = new FileInfo(path + "e.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[3] = SoundEffect.FromFile(path + "e.wav");
+                                    fi = new FileInfo(path + "o.wav");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                        voices[4] = SoundEffect.FromFile(path + "o.wav");
+                                }
+                                catch
+                                {
+                                    voices[0] = Content.Load<SoundEffect>("Audio/Voices/sawyer-01");
+                                    voices[1] = Content.Load<SoundEffect>("Audio/Voices/sawyer-02");
+                                    voices[2] = Content.Load<SoundEffect>("Audio/Voices/sawyer-03");
+                                    voices[3] = Content.Load<SoundEffect>("Audio/Voices/sawyer-04");
+                                    voices[4] = Content.Load<SoundEffect>("Audio/Voices/sawyer-05");
+                                }
                                 string json = File.ReadAllText(path + "details.json");
                                 Custom = JsonSerializer.Deserialize<BBG>(json);
-                                bbgDialogue = Custom.BBGDialogue;
-                                playerDialogue = Custom.PlayerDialogue;
+                                if (Custom.BBGDialogue.Count == Berry.BBGDialogue.Count)
+                                    bbgDialogue = Custom.BBGDialogue;
+                                else
+                                    bbgDialogue = Berry.BBGDialogue;
+                                if (Custom.PlayerDialogue.Count == Berry.PlayerDialogue.Count)
+                                    playerDialogue = Custom.PlayerDialogue;
+                                else
+                                    playerDialogue = Berry.PlayerDialogue;
                                 name = Custom.Name;
                                 nametagColor = Custom.Color;
                                 emotionOverlay = Custom.OverlayExpression;
@@ -304,52 +592,109 @@ namespace Cheesenaf
                                 emotionOverlay = Berry.OverlayExpression;
                             }
                         }
+                        else
+                        {
+                            bbgs[0] = Content.Load<Texture2D>("BBGSim/berry");
+                            bbgs[1] = Content.Load<Texture2D>("BBGSim/berryhappy");
+                            bbgs[2] = Content.Load<Texture2D>("BBGSim/berryneutral");
+                            bbgs[3] = Content.Load<Texture2D>("BBGSim/berryunhappy");
+                            voices[0] = Content.Load<SoundEffect>("Audio/Voices/sawyer-01");
+                            voices[1] = Content.Load<SoundEffect>("Audio/Voices/sawyer-02");
+                            voices[2] = Content.Load<SoundEffect>("Audio/Voices/sawyer-03");
+                            voices[3] = Content.Load<SoundEffect>("Audio/Voices/sawyer-04");
+                            voices[4] = Content.Load<SoundEffect>("Audio/Voices/sawyer-05");
+                            bbgDialogue = Berry.BBGDialogue;
+                            playerDialogue = Berry.PlayerDialogue;
+                            name = Berry.Name;
+                            nametagColor = Berry.Color;
+                            emotionOverlay = Berry.OverlayExpression;
+                        }
                     }
                     break;
-                case 5:
-                    foreach (string mod in Game1.Modpacks)
+                default:
+                    path = Game1.BBGs[Game1.saveData.Bbg - 5] + Path.DirectorySeparatorChar;
+                    try
                     {
-                        if (Directory.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs"))
+                        FileInfo fi = new FileInfo(path + "base.png");
+                        if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                            bbgs[0] = Texture2D.FromFile(Game1.GraphicsDevice, path + "base.png");
+                        else
+                            bbgs[0] = Content.Load<Texture2D>("BBGSim/syowen");
+                        fi = new FileInfo(path + "happy.png");
+                        if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                            bbgs[1] = Texture2D.FromFile(Game1.GraphicsDevice, path + "happy.png");
+                        else
+                            bbgs[1] = Content.Load<Texture2D>("BBGSim/syowenhappy");
+                        fi = new FileInfo(path + "neutral.png");
+                        if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                            bbgs[2] = Texture2D.FromFile(Game1.GraphicsDevice, path + "neutral.png");
+                        else
+                            bbgs[2] = Content.Load<Texture2D>("BBGSim/syowenneutral");
+                        fi = new FileInfo(path + "unhappy.png");
+                        if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                            bbgs[3] = Texture2D.FromFile(Game1.GraphicsDevice, path + "unhappy.png");
+                        else
+                            bbgs[3] = Content.Load<Texture2D>("BBGSim/syowenunhappy");
+
+                        try
                         {
-                            string path = "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar;
-                            try
-                            {
-                                bbgs[0] = Texture2D.FromFile(Game1.GraphicsDevice, path + "base");
-                                bbgs[1] = Texture2D.FromFile(Game1.GraphicsDevice, path + "happy");
-                                bbgs[2] = Texture2D.FromFile(Game1.GraphicsDevice, path + "neutral");
-                                bbgs[3] = Texture2D.FromFile(Game1.GraphicsDevice, path + "unhappy");
-                                voices[0] = Content.Load<SoundEffect>("Audio/Voices/sawyer-01");
-                                voices[1] = Content.Load<SoundEffect>("Audio/Voices/sawyer-02");
-                                voices[2] = Content.Load<SoundEffect>("Audio/Voices/sawyer-03");
-                                voices[3] = Content.Load<SoundEffect>("Audio/Voices/sawyer-04");
-                                voices[4] = Content.Load<SoundEffect>("Audio/Voices/sawyer-05");
-                                string json = File.ReadAllText(path + "details.json");
-                                Custom = JsonSerializer.Deserialize<BBG>(json);
-                                bbgDialogue = Custom.BBGDialogue;
-                                playerDialogue = Custom.PlayerDialogue;
-                                name = Custom.Name;
-                                nametagColor = Custom.Color;
-                                emotionOverlay = Custom.OverlayExpression;
-                                break;
-                            }
-                            catch 
-                            {
-                                bbgs[0] = Content.Load<Texture2D>("BBGSim/syowen");
-                                bbgs[1] = Content.Load<Texture2D>("BBGSim/syowenhappy");
-                                bbgs[2] = Content.Load<Texture2D>("BBGSim/syowenneutral");
-                                bbgs[3] = Content.Load<Texture2D>("BBGSim/syowenunhappy");
-                                voices[0] = Content.Load<SoundEffect>("Audio/Voices/sb_a");
-                                voices[1] = Content.Load<SoundEffect>("Audio/Voices/sb_i");
-                                voices[2] = Content.Load<SoundEffect>("Audio/Voices/sb_u");
-                                voices[3] = Content.Load<SoundEffect>("Audio/Voices/sb_e");
-                                voices[4] = Content.Load<SoundEffect>("Audio/Voices/sb_o");
-                                bbgDialogue = Syowen.BBGDialogue;
-                                playerDialogue = Syowen.PlayerDialogue;
-                                name = Syowen.Name;
-                                nametagColor = Syowen.Color;
-                                emotionOverlay = Syowen.OverlayExpression;
-                            }
+                            fi = new FileInfo(path + "a.wav");
+                            if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                voices[0] = SoundEffect.FromFile(path + "a.wav");
+                            fi = new FileInfo(path + "i.wav");
+                            if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                voices[1] = SoundEffect.FromFile(path + "i.wav");
+                            fi = new FileInfo(path + "u.wav");
+                            if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                voices[2] = SoundEffect.FromFile(path + "u.wav");
+                            fi = new FileInfo(path + "e.wav");
+                            if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                voices[3] = SoundEffect.FromFile(path + "e.wav");
+                            fi = new FileInfo(path + "o.wav");
+                            if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                voices[4] = SoundEffect.FromFile(path + "o.wav");
                         }
+                        catch
+                        {
+                            voices[0] = Content.Load<SoundEffect>("Audio/Voices/sawyer-01");
+                            voices[1] = Content.Load<SoundEffect>("Audio/Voices/sawyer-02");
+                            voices[2] = Content.Load<SoundEffect>("Audio/Voices/sawyer-03");
+                            voices[3] = Content.Load<SoundEffect>("Audio/Voices/sawyer-04");
+                            voices[4] = Content.Load<SoundEffect>("Audio/Voices/sawyer-05");
+                        }
+                        string json = File.ReadAllText(path + "details.json");
+                        Custom = JsonSerializer.Deserialize<BBG>(json);
+                        if (Custom.BBGDialogue.Count == Syowen.BBGDialogue.Count)
+                            bbgDialogue = Custom.BBGDialogue;
+                        else
+                            bbgDialogue = Syowen.BBGDialogue;
+                        if (Custom.PlayerDialogue.Count == Syowen.PlayerDialogue.Count)
+                            playerDialogue = Custom.PlayerDialogue;
+                        else
+                            playerDialogue = Syowen.PlayerDialogue;
+                        name = Custom.Name;
+                        nametagColor = Custom.Color;
+                        emotionOverlay = Custom.OverlayExpression;
+                        break;
+                    }
+                    catch
+                    {
+                        Game1.saveData.Bbg = 0;
+                        Game1.Save(Game1.saveData);
+                        bbgs[0] = Content.Load<Texture2D>("BBGSim/syowen");
+                        bbgs[1] = Content.Load<Texture2D>("BBGSim/syowenhappy");
+                        bbgs[2] = Content.Load<Texture2D>("BBGSim/syowenneutral");
+                        bbgs[3] = Content.Load<Texture2D>("BBGSim/syowenunhappy");
+                        voices[0] = Content.Load<SoundEffect>("Audio/Voices/sb_a");
+                        voices[1] = Content.Load<SoundEffect>("Audio/Voices/sb_i");
+                        voices[2] = Content.Load<SoundEffect>("Audio/Voices/sb_u");
+                        voices[3] = Content.Load<SoundEffect>("Audio/Voices/sb_e");
+                        voices[4] = Content.Load<SoundEffect>("Audio/Voices/sb_o");
+                        bbgDialogue = Syowen.BBGDialogue;
+                        playerDialogue = Syowen.PlayerDialogue;
+                        name = Syowen.Name;
+                        nametagColor = Syowen.Color;
+                        emotionOverlay = Syowen.OverlayExpression;
                     }
                     break;
             }

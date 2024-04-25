@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using static Cheesenaf.Modmenu;
 using System.Text.Json;
+using System.Collections.Generic;
 
 namespace Cheesenaf
 {
@@ -19,10 +20,11 @@ namespace Cheesenaf
         private SoundEffect select;
         private SoundEffect wumbo;
         Game1 Game1;
-        string[] names;
+        List<string> names;
         Texture2D bg;
         Texture2D title;
         Texture2D icons;
+        List<Texture2D> modIcons;
         float bounceTextScale;
         float titleOffsetY;
         float startScale = 1;
@@ -70,12 +72,20 @@ namespace Cheesenaf
         {
             public string[] splashtext {  get; set; }
         }
+        public class BBG()
+        {
+            public string Name { get; set; }
+            public List<string> BBGDialogue { get; set; }
+            public List<string> PlayerDialogue { get; set; }
+            public Color Color { get; set; }
+            public bool OverlayExpression { get; set; }
+        }
 
         public Splashes Modtext = new Splashes()
         {
             splashtext = ["Broken"]
         };
-
+        #region Splashtexts
         public string[] splashtexts =
             [
                 "Not a dating sim!",
@@ -279,12 +289,18 @@ namespace Cheesenaf
                 "Personality!?!?!?!?!",
                 "Peter, what are you doing?"
             ];
+        #endregion
         bool splashesModded;
         int splashid;
         float time;
         int[] splashCoords = new int[2] { 1500, 250 };
         float[] splashSize = new float[2];
         Random rng;
+        bool[] bbgModLoaded = new bool[5];
+        int[] bbgModIcon = new int[6];
+        List<int> addedBBGIcon = new List<int>();
+        bool modBG;
+        bool modMusic;
         public void LoadContent(ContentManager Content)
         {
             bg = Content.Load<Texture2D>("BBGSim/Cherry_Blossom_Tree");
@@ -306,11 +322,16 @@ namespace Cheesenaf
             Game1.ClearColor = Color.LightPink;
             names = ["Syowen", "Mocha", "Brett", "Alan", "Berry"];
             rng = new Random();
+            modIcons = new List<Texture2D>();
+            if (Game1.saveData.Bbg > 4 + Game1.BBGs.Count)
+            {
+                Game1.saveData.Bbg = 0;
+            }
             if (Game1.Modpacks.Count > 0)
             {
                 foreach (string mod in Game1.Modpacks)
                 {
-                    if (File.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "text" + Path.DirectorySeparatorChar + "splash.json"))
+                    if (File.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "text" + Path.DirectorySeparatorChar + "splash.json") && !splashesModded)
                     {
                         try
                         {
@@ -321,7 +342,201 @@ namespace Cheesenaf
                                 splashtexts = Modtext.splashtext;
                                 splashesModded = true;
                             }
-                            break;
+                        }
+                        catch { }
+                    }
+                    if (File.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Syowen" + Path.DirectorySeparatorChar + "details.json") && !bbgModLoaded[0])
+                    {
+                        try
+                        {
+                            string file = File.ReadAllText("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Syowen" + Path.DirectorySeparatorChar + "details.json");
+                            BBG temp = JsonSerializer.Deserialize<BBG>(file);
+                            names[0] = temp.Name;
+                            if (File.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Syowen" + Path.DirectorySeparatorChar + "select.png"))
+                            {
+                                try
+                                {
+                                    FileInfo fi = new FileInfo("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Syowen" + Path.DirectorySeparatorChar + "select.png");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    {
+                                        modIcons.Add(Texture2D.FromFile(Game1.GraphicsDevice, "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Syowen" + Path.DirectorySeparatorChar + "select.png"));
+                                        bbgModIcon[0] = modIcons.Count - 1;
+                                    }
+                                    else
+                                        bbgModIcon[0] = 999999;
+                                }
+                                catch
+                                {
+                                    bbgModIcon[0] = 999999;
+                                }
+                            }
+                            else
+                                bbgModIcon[0] = 999999;
+                            bbgModLoaded[0] = true;
+                        }
+                        catch { }
+                    }
+                    if (File.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Mocha" + Path.DirectorySeparatorChar + "details.json") && !bbgModLoaded[1])
+                    {
+                        try
+                        {
+                            string file = File.ReadAllText("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Mocha" + Path.DirectorySeparatorChar + "details.json");
+                            BBG temp = JsonSerializer.Deserialize<BBG>(file);
+                            names[1] = temp.Name;
+                            if (File.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Mocha" + Path.DirectorySeparatorChar + "select.png"))
+                            {
+                                try
+                                {
+                                    FileInfo fi = new FileInfo("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Mocha" + Path.DirectorySeparatorChar + "select.png");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    {
+                                        modIcons.Add(Texture2D.FromFile(Game1.GraphicsDevice, "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Mocha" + Path.DirectorySeparatorChar + "select.png"));
+                                        bbgModIcon[1] = modIcons.Count - 1;
+                                    }
+                                    else
+                                        bbgModIcon[1] = 999999;
+                                }
+                                catch
+                                {
+                                    bbgModIcon[1] = 999999;
+                                }
+                            }
+                            else
+                                bbgModIcon[1] = 999999;
+                            bbgModLoaded[1] = true;
+                        }
+                        catch { }
+                    }
+                    if (File.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Brett" + Path.DirectorySeparatorChar + "details.json") && !bbgModLoaded[2])
+                    {
+                        try
+                        {
+                            string file = File.ReadAllText("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Brett" + Path.DirectorySeparatorChar + "details.json");
+                            BBG temp = JsonSerializer.Deserialize<BBG>(file);
+                            names[2] = temp.Name;
+                            if (File.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Brett" + Path.DirectorySeparatorChar + "select.png"))
+                            {
+                                try
+                                {
+                                    FileInfo fi = new FileInfo("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Brett" + Path.DirectorySeparatorChar + "select.png");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    {
+                                        modIcons.Add(Texture2D.FromFile(Game1.GraphicsDevice, "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Brett" + Path.DirectorySeparatorChar + "select.png"));
+                                        bbgModIcon[2] = modIcons.Count - 1;
+                                    }
+                                    else
+                                        bbgModIcon[2] = 999999;
+                                }
+                                catch
+                                {
+                                    bbgModIcon[2] = 999999;
+                                }
+                            }
+                            else
+                                bbgModIcon[2] = 999999;
+                            bbgModLoaded[2] = true;
+                        }
+                        catch { }
+                    }
+                    if (File.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Alan" + Path.DirectorySeparatorChar + "details.json") && !bbgModLoaded[3])
+                    {
+                        try
+                        {
+                            string file = File.ReadAllText("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Alan" + Path.DirectorySeparatorChar + "details.json");
+                            BBG temp = JsonSerializer.Deserialize<BBG>(file);
+                            names[3] = temp.Name;
+                            if (File.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Alan" + Path.DirectorySeparatorChar + "select.png"))
+                            {
+                                try
+                                {
+                                    FileInfo fi = new FileInfo("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Alan" + Path.DirectorySeparatorChar + "select.png");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    {
+                                        modIcons.Add(Texture2D.FromFile(Game1.GraphicsDevice, "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Alan" + Path.DirectorySeparatorChar + "select.png"));
+                                        bbgModIcon[3] = modIcons.Count - 1;
+                                    }
+                                    else
+                                        bbgModIcon[3] = 999999;
+                                }
+                                catch
+                                {
+                                    bbgModIcon[3] = 999999;
+                                }
+                            }
+                            else
+                                bbgModIcon[3] = 999999;
+                            bbgModLoaded[3] = true;
+                        }
+                        catch { }
+                    }
+                    if (File.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Berry" + Path.DirectorySeparatorChar + "details.json") && !bbgModLoaded[4])
+                    {
+                        try
+                        {
+                            string file = File.ReadAllText("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Berry" + Path.DirectorySeparatorChar + "details.json");
+                            BBG temp = JsonSerializer.Deserialize<BBG>(file);
+                            names[4] = temp.Name;
+                            if (File.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Berry" + Path.DirectorySeparatorChar + "select.png"))
+                            {
+                                try
+                                {
+                                    FileInfo fi = new FileInfo("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Berry" + Path.DirectorySeparatorChar + "select.png");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    {
+                                        modIcons.Add(Texture2D.FromFile(Game1.GraphicsDevice, "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Berry" + Path.DirectorySeparatorChar + "select.png"));
+                                        bbgModIcon[4] = modIcons.Count - 1;
+                                    }
+                                    else
+                                        bbgModIcon[4] = 999999;
+                                }
+                                catch
+                                {
+                                    bbgModIcon[4] = 999999;
+                                }
+                            }
+                            else
+                                bbgModIcon[4] = 999999;
+                            bbgModLoaded[4] = true;
+                        }
+                        catch { }
+                    }
+                }
+                foreach (var mod in Game1.BBGs)
+                {
+                    if (File.Exists(mod + Path.DirectorySeparatorChar + "details.json"))
+                    {
+                        try
+                        {
+                            string file = File.ReadAllText(mod + Path.DirectorySeparatorChar + "details.json");
+                            BBG temp = JsonSerializer.Deserialize<BBG>(file);
+                            names.Add(temp.Name);
+                            if (File.Exists(mod + Path.DirectorySeparatorChar + "select.png"))
+                            {
+                                try
+                                {
+                                    FileInfo fi = new FileInfo(mod + Path.DirectorySeparatorChar + "select.png");
+                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    {
+                                        modIcons.Add(Texture2D.FromFile(Game1.GraphicsDevice, mod + Path.DirectorySeparatorChar + "select.png"));
+                                        addedBBGIcon.Add(modIcons.Count - 1);
+                                    }
+                                    else
+                                    {
+                                        modIcons.Add(Game1.debugbox);
+                                        addedBBGIcon.Add(modIcons.Count - 1);
+                                    }
+                                }
+                                catch
+                                {
+                                    modIcons.Add(Game1.debugbox);
+                                    addedBBGIcon.Add(modIcons.Count - 1);
+                                }
+                            }
+                            else
+                            {
+                                modIcons.Add(Game1.debugbox);
+                                addedBBGIcon.Add(modIcons.Count - 1);
+                            }
                         }
                         catch { }
                     }
@@ -382,24 +597,81 @@ namespace Cheesenaf
             }
             if (Game1.GetMouseDown() && selection() == 2)
             {
-                if (Game1.saveData.Bbg < 3)
+                if (Game1.BBGs.Count == 0)
                 {
-                    Game1.saveData.Bbg++;
-                    select.Play();
-                    Game1.Save(Game1.saveData);
+                    if (Game1.saveData.Bbg < 3)
+                    {
+                        Game1.saveData.Bbg++;
+                        select.Play();
+                        Game1.Save(Game1.saveData);
+                    }
+                    else if (Game1.saveData.Bbg < 4 && Game1.saveData.UnlockedSecret)
+                    {
+                        Game1.saveData.Bbg++;
+                        select.Play();
+                        Game1.Save(Game1.saveData);
+                    }
                 }
-                else if (Game1.saveData.Bbg < 4 && Game1.saveData.UnlockedSecret)
+                else
                 {
-                    Game1.saveData.Bbg++;
-                    select.Play();
-                    Game1.Save(Game1.saveData);
+                    if (Game1.saveData.Bbg < 3 || Game1.saveData.Bbg == 4)
+                    {
+                        Game1.saveData.Bbg++;
+                        select.Play();
+                        Game1.Save(Game1.saveData);
+                    }
+                    else if (Game1.saveData.Bbg == 3)
+                    {
+                        if (Game1.saveData.UnlockedSecret)
+                        {
+                            Game1.saveData.Bbg++;
+                            select.Play();
+                            Game1.Save(Game1.saveData);
+                        }
+                        else
+                        {
+                            Game1.saveData.Bbg += 2;
+                            select.Play();
+                            Game1.Save(Game1.saveData);
+                        }
+                    }
+                    else if (Game1.saveData.Bbg >= 5 && (Game1.saveData.Bbg - 4) < Game1.BBGs.Count)
+                    {
+                        Game1.saveData.Bbg++;
+                        select.Play();
+                        Game1.Save(Game1.saveData);
+                    }
                 }
             }
-            if (Game1.GetMouseDown() && selection() == 1 && Game1.saveData.Bbg > 0)
+            if (Game1.GetMouseDown() && selection() == 1)
             {
-                Game1.saveData.Bbg--;
-                select.Play();
-                Game1.Save(Game1.saveData);
+                if (Game1.BBGs.Count == 0)
+                {
+                    if (Game1.saveData.Bbg > 0)
+                    {
+                        Game1.saveData.Bbg--;
+                        select.Play();
+                        Game1.Save(Game1.saveData);
+                    }
+                }
+                else
+                {
+                    if (Game1.saveData.Bbg > 0)
+                    {
+                        if (Game1.saveData.Bbg == 5 && !Game1.saveData.UnlockedSecret)
+                        {
+                            Game1.saveData.Bbg -= 2;
+                            select.Play();
+                            Game1.Save(Game1.saveData);
+                        }
+                        else
+                        {
+                            Game1.saveData.Bbg--;
+                            select.Play();
+                            Game1.Save(Game1.saveData);
+                        }
+                    }
+                }
             }
             if (selection() == 0)
             {
@@ -534,6 +806,35 @@ namespace Cheesenaf
                 new Vector2((splashSize[0] / 2) - 1.8f, (splashSize[1] / 2) - 1.8f), bounceTextScale, reverseText == true ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
             _spriteBatch.DrawString(Game1.PixelFont, splash, new Vector2(splashCoords[0], splashCoords[1]), Color.Yellow, -titleOffsetY / 30,
                 new Vector2(splashSize[0] / 2, splashSize[1] / 2), bounceTextScale, reverseText == true ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+            if (Game1.saveData.Bbg < 5)
+            {
+                if (bbgModLoaded[Game1.saveData.Bbg] && bbgModIcon[Game1.saveData.Bbg] != 999999)
+                {
+                    try
+                    {
+                        _spriteBatch.Draw(modIcons[bbgModIcon[Game1.saveData.Bbg]], new Rectangle(1340, 620, 180, 180), new Rectangle(0, 0, modIcons[bbgModIcon[Game1.saveData.Bbg]].Width, modIcons[bbgModIcon[Game1.saveData.Bbg]].Height), Color.White);
+                    }
+                    catch
+                    {
+                        _spriteBatch.Draw(icons, new Vector2(1325, 600), iconSpaces[Game1.saveData.Bbg], Color.White);
+                    }
+                }
+                else
+                {
+                    _spriteBatch.Draw(icons, new Vector2(1325, 600), iconSpaces[Game1.saveData.Bbg], Color.White);
+                }
+            }
+            else
+            {
+                try
+                {
+                    _spriteBatch.Draw(modIcons[addedBBGIcon[Game1.saveData.Bbg - 5]], new Rectangle(1340, 620, 180, 180), new Rectangle(0, 0, modIcons[addedBBGIcon[Game1.saveData.Bbg - 5]].Width, modIcons[addedBBGIcon[Game1.saveData.Bbg - 5]].Height), Color.White);
+                }
+                catch
+                {
+                    _spriteBatch.Draw(Game1.debugbox, new Vector2(1325, 600), iconSpaces[0], Color.White);
+                }
+            }
             _spriteBatch.DrawString(bbgfont, "Pick your bbg: " + names[Game1.saveData.Bbg], new Vector2(1100,800), Color.Black);
             _spriteBatch.DrawString(defaultfont, "<-    ->", new Vector2(1360,850), Color.Black);
             if (!splashesModded)
@@ -551,7 +852,6 @@ namespace Cheesenaf
                 _spriteBatch.DrawString(Game1.PixelFont, "Save file at 100%!! Thank you for playing!", new Vector2(12, 1027), new Color(rainbow.R / 2, rainbow.G / 2, rainbow.B / 2));
                 _spriteBatch.DrawString(Game1.PixelFont, "Save file at 100%!! Thank you for playing!", new Vector2(10, 1025), rainbow);
             }
-            _spriteBatch.Draw(icons, new Vector2(1325, 600), iconSpaces[Game1.saveData.Bbg], Color.White);
             _spriteBatch.DrawString(bbgfont, "Start", new Vector2(1460,925), Color.Black, 0, new Vector2(bbgfont.MeasureString("Start").X/2, bbgfont.MeasureString("Start").Y / 2),
                 startScale, SpriteEffects.None, 0);
             if (unlockAlpha > 0)
