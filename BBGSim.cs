@@ -56,6 +56,7 @@ namespace Cheesenaf
 
         Texture2D[] bbgs;
         Texture2D[] bgs;
+        bool[] bgModded;
         SoundEffect[] voices;
         int emotion = 1;
         bool emotionOverlay;
@@ -800,6 +801,7 @@ namespace Cheesenaf
             dialogueUI = Content.Load<Texture2D>("BBGSim/bbgdialogue");
             enterSign = Content.Load<Texture2D>("BBGSim/entersymbol");
             bgs = [Content.Load<Texture2D>("BBGSim/Cherry_Blossom_Tree"), Content.Load<Texture2D>("BBGSim/Lanterns")];
+            bgModded = new bool[2];
             UIRects[0] = new Rectangle(0,0,1592,604); //Textbox
             UIRects[1] = new Rectangle(107,671,824,300); //Nametag
             UIRects[2] = new Rectangle(1047,637,543,524); //Choicesbox
@@ -815,6 +817,34 @@ namespace Cheesenaf
                         modSong = SoundEffect.FromFile(path).CreateInstance();
                         modSong.IsLooped = true;
                         modSong.Play();
+                        break;
+                    }
+                    catch { }
+                }
+            }
+            foreach (string mod in Game1.Modpacks)
+            {
+                if (File.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "textures" + Path.DirectorySeparatorChar + "simp1.png"))
+                {
+                    path = "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "textures" + Path.DirectorySeparatorChar + "simp1.png";
+                    try
+                    {
+                        bgs[0] = Texture2D.FromFile(Game1.GraphicsDevice, path);
+                        bgModded[0] = true;
+                        break;
+                    }
+                    catch { }
+                }
+            }
+            foreach (string mod in Game1.Modpacks)
+            {
+                if (File.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "textures" + Path.DirectorySeparatorChar + "simp2.png"))
+                {
+                    path = "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "textures" + Path.DirectorySeparatorChar + "simp2.png";
+                    try
+                    {
+                        bgs[1] = Texture2D.FromFile(Game1.GraphicsDevice, path);
+                        bgModded[1] = true;
                         break;
                     }
                     catch { }
@@ -1330,11 +1360,17 @@ namespace Cheesenaf
         {
             if (Game1.ClearColor == Color.Navy)
             {
-                _spriteBatch.Draw(bgs[1], new Vector2(-100, 0), new Rectangle(0, 0, 3000, 1500), Color.White, 0, new Vector2(0, 0), 0.72f, SpriteEffects.None, 0);
+                if (bgModded[1])
+                    _spriteBatch.Draw(bgs[1], new Rectangle(0, 0,1920,1080), new Rectangle(0, 0, bgs[1].Width, bgs[1].Height), Color.White, 0, new Vector2(0, 0), SpriteEffects.None, 0);
+                else
+                    _spriteBatch.Draw(bgs[1], new Vector2(-100, 0), new Rectangle(0, 0, 3000, 1500), Color.White, 0, new Vector2(0, 0), 0.72f, SpriteEffects.None, 0);
             }
             else
             {
-                _spriteBatch.Draw(bgs[0], new Vector2(-100, 0), new Rectangle(0, 0, 3000, 1500), Color.White, 0, new Vector2(0, 0), 0.72f, SpriteEffects.FlipHorizontally, 0);
+                if (bgModded[0])
+                    _spriteBatch.Draw(bgs[0], new Rectangle(0, 0, 1920, 1080), new Rectangle(0, 0, bgs[0].Width, bgs[0].Height), Color.White, 0, new Vector2(0, 0), SpriteEffects.None, 0);
+                else
+                    _spriteBatch.Draw(bgs[0], new Vector2(-100, 0), new Rectangle(0, 0, 3000, 1500), Color.White, 0, new Vector2(0, 0), 0.72f, SpriteEffects.FlipHorizontally, 0);
             }
             if (bbgs[0] != null)
             {
