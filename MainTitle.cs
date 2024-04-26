@@ -15,6 +15,7 @@ namespace Cheesenaf
     internal class MainTitle
     {
         private Song titleMusic;
+        private SoundEffectInstance modMusic;
         private SoundEffect unlock;
         private SoundEffect jumpscare;
         private SoundEffect select;
@@ -300,10 +301,10 @@ namespace Cheesenaf
         int[] bbgModIcon = new int[6];
         List<int> addedBBGIcon = new List<int>();
         bool modBG;
-        bool modMusic;
         public void LoadContent(ContentManager Content)
         {
-            bg = Content.Load<Texture2D>("BBGSim/Cherry_Blossom_Tree");
+            if (!modBG)
+                bg = Content.Load<Texture2D>("BBGSim/Cherry_Blossom_Tree");
             title = Content.Load<Texture2D>("BBGSim/titlepng");
             unlock = Content.Load<SoundEffect>("Audio/unlock");
             jumpscare = Content.Load<SoundEffect>("Audio/jumpscare2");
@@ -316,9 +317,6 @@ namespace Cheesenaf
         public void Initialize(Game1 game1)
         {
             Game1 = game1;
-            titleMusic = Game1.Content.Load<Song>("Audio/title");
-            MediaPlayer.IsRepeating = true;
-            MediaPlayer.Play(titleMusic);
             Game1.ClearColor = Color.LightPink;
             names = ["Syowen", "Mocha", "Brett", "Alan", "Berry"];
             rng = new Random();
@@ -357,7 +355,7 @@ namespace Cheesenaf
                                 try
                                 {
                                     FileInfo fi = new FileInfo("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Syowen" + Path.DirectorySeparatorChar + "select.png");
-                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    if (fi.Length / 1024 / 1024 <= 50) //50 mb limit
                                     {
                                         modIcons.Add(Texture2D.FromFile(Game1.GraphicsDevice, "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Syowen" + Path.DirectorySeparatorChar + "select.png"));
                                         bbgModIcon[0] = modIcons.Count - 1;
@@ -388,7 +386,7 @@ namespace Cheesenaf
                                 try
                                 {
                                     FileInfo fi = new FileInfo("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Mocha" + Path.DirectorySeparatorChar + "select.png");
-                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    if (fi.Length / 1024 / 1024 <= 50) //50 mb limit
                                     {
                                         modIcons.Add(Texture2D.FromFile(Game1.GraphicsDevice, "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Mocha" + Path.DirectorySeparatorChar + "select.png"));
                                         bbgModIcon[1] = modIcons.Count - 1;
@@ -419,7 +417,7 @@ namespace Cheesenaf
                                 try
                                 {
                                     FileInfo fi = new FileInfo("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Brett" + Path.DirectorySeparatorChar + "select.png");
-                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    if (fi.Length / 1024 / 1024 <= 50) //50 mb limit
                                     {
                                         modIcons.Add(Texture2D.FromFile(Game1.GraphicsDevice, "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Brett" + Path.DirectorySeparatorChar + "select.png"));
                                         bbgModIcon[2] = modIcons.Count - 1;
@@ -450,7 +448,7 @@ namespace Cheesenaf
                                 try
                                 {
                                     FileInfo fi = new FileInfo("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Alan" + Path.DirectorySeparatorChar + "select.png");
-                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    if (fi.Length / 1024 / 1024 <= 50) //50 mb limit
                                     {
                                         modIcons.Add(Texture2D.FromFile(Game1.GraphicsDevice, "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Alan" + Path.DirectorySeparatorChar + "select.png"));
                                         bbgModIcon[3] = modIcons.Count - 1;
@@ -481,7 +479,7 @@ namespace Cheesenaf
                                 try
                                 {
                                     FileInfo fi = new FileInfo("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Berry" + Path.DirectorySeparatorChar + "select.png");
-                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    if (fi.Length / 1024 / 1024 <= 50) //50 mb limit
                                     {
                                         modIcons.Add(Texture2D.FromFile(Game1.GraphicsDevice, "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "bbgs" + Path.DirectorySeparatorChar + "Berry" + Path.DirectorySeparatorChar + "select.png"));
                                         bbgModIcon[4] = modIcons.Count - 1;
@@ -500,6 +498,44 @@ namespace Cheesenaf
                         }
                         catch { }
                     }
+                    if (File.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "textures" + Path.DirectorySeparatorChar + "simtitle.png"))
+                    {
+                        try
+                        {
+                            FileInfo fi = new FileInfo("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "textures" + Path.DirectorySeparatorChar + "simtitle.png");
+                            if (fi.Length / 1024 / 1024 <= 50) //50 mb limit
+                            {
+                                bg = Texture2D.FromFile(Game1.GraphicsDevice, "Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "textures" + Path.DirectorySeparatorChar + "simtitle.png");
+                                modBG = true;
+                            }
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                    if (File.Exists("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "audio" + Path.DirectorySeparatorChar + "simtitle.wav"))
+                    {
+                        if (modMusic == null)
+                        {
+                            try
+                            {
+                                FileInfo fi = new FileInfo("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "audio" + Path.DirectorySeparatorChar + "simtitle.wav");
+                                if (fi.Length / 1024 / 1024 <= 50) //50 mb limit
+                                {
+                                    modMusic = SoundEffect.FromFile("Mods" + Path.DirectorySeparatorChar + mod + Path.DirectorySeparatorChar + "audio" + Path.DirectorySeparatorChar + "simtitle.wav").CreateInstance();
+                                    modMusic.IsLooped = true;
+                                    if (modMusic.State != SoundState.Playing)
+                                        modMusic.Play();
+                                    if (MediaPlayer.State == MediaState.Playing) MediaPlayer.Stop();
+                                }
+                            }
+                            catch
+                            {
+
+                            }
+                        }
+                    }
                 }
                 foreach (var mod in Game1.BBGs)
                 {
@@ -515,7 +551,7 @@ namespace Cheesenaf
                                 try
                                 {
                                     FileInfo fi = new FileInfo(mod + Path.DirectorySeparatorChar + "select.png");
-                                    if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                                    if (fi.Length / 1024 / 1024 <= 50) //50 mb limit
                                     {
                                         modIcons.Add(Texture2D.FromFile(Game1.GraphicsDevice, mod + Path.DirectorySeparatorChar + "select.png"));
                                         addedBBGIcon.Add(modIcons.Count - 1);
@@ -541,6 +577,12 @@ namespace Cheesenaf
                         catch { }
                     }
                 }
+            }
+            if (modMusic == null)
+            {
+                titleMusic = Game1.Content.Load<Song>("Audio/title");
+                MediaPlayer.IsRepeating = true;
+                MediaPlayer.Play(titleMusic);
             }
             splashid = rng.Next(0, splashtexts.Length);
             if (!splashesModded)
@@ -580,6 +622,10 @@ namespace Cheesenaf
             if (Game1.GetKeyUp(Keys.F12))
             {
                 MediaPlayer.Stop();
+                if (modMusic != null)
+                {
+                    modMusic.Pause();
+                }
                 Game1.ChangeScene(4);
             }
             if (splashtexts[splashid].Contains("§C")) loading = true;
@@ -593,6 +639,10 @@ namespace Cheesenaf
             {
                 Game1.Save(Game1.saveData);
                 Game1.Window.AllowAltF4 = true;
+                if (modMusic != null)
+                {
+                    modMusic.Pause();
+                }
                 Game1.ChangeScene(1);
             }
             if (Game1.GetMouseDown() && selection() == 2)
@@ -800,7 +850,10 @@ namespace Cheesenaf
 
         public void Draw(SpriteBatch _spriteBatch, GameTime gameTime, SpriteFont defaultfont, SpriteFont bbgfont, Texture2D debugbox)
         {
-            _spriteBatch.Draw(bg,new Vector2(-100,0),new Rectangle(0,0, 3000,1500),Color.White, 0, new Vector2(0,0), 0.72f, SpriteEffects.None, 0);
+            if (modBG)
+                _spriteBatch.Draw(bg,new Rectangle(0,0, 1920, 1080),new Rectangle(0,0, bg.Width, bg.Height),Color.White, 0, new Vector2(0,0), SpriteEffects.None, 0);
+            else
+                _spriteBatch.Draw(bg, new Vector2(-100, 0), new Rectangle(0, 0, 3000, 1500), Color.White, 0, new Vector2(0, 0), 0.72f, SpriteEffects.None, 0);
             _spriteBatch.Draw(title,new Vector2(1275,150 + titleOffsetY),new Rectangle(0,0, 1536,218),Color.White, 0, new Vector2(title.Width/2, title.Height/2), 0.72f, SpriteEffects.None, 0);
             _spriteBatch.DrawString(Game1.PixelFont, splash, new Vector2(splashCoords[0], splashCoords[1]), Color.SandyBrown, -titleOffsetY / 30,
                 new Vector2((splashSize[0] / 2) - 1.8f, (splashSize[1] / 2) - 1.8f), bounceTextScale, reverseText == true ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);

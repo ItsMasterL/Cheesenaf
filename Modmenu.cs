@@ -620,7 +620,7 @@ namespace Cheesenaf
                     if (File.Exists(dir + Path.DirectorySeparatorChar + "icon.png"))
                     {
                         FileInfo fi = new FileInfo(dir + Path.DirectorySeparatorChar + "icon.png");
-                        if (fi.Length / 1024 / 1024 <= 15) //15 mb limit
+                        if (fi.Length / 1024 / 1024 <= 50) //50 mb limit
                             modpack.Icon = Texture2D.FromFile(Game1.GraphicsDevice, dir + Path.DirectorySeparatorChar + "icon.png");
                     }
                     if (File.Exists(dir + Path.DirectorySeparatorChar + "text" + Path.DirectorySeparatorChar + "splash.json"))
@@ -633,11 +633,11 @@ namespace Cheesenaf
                     }
                     if (Directory.Exists(dir + Path.DirectorySeparatorChar + "textures"))
                     {
-                        modpack.BBGSimMod = true;
+                        modpack.ImageMod = true;
                     }
                     if (Directory.Exists(dir + Path.DirectorySeparatorChar + "audio"))
                     {
-                        modpack.BBGSimMod = true;
+                        modpack.AudioMod = true;
                     }
                     if (Game1.saveData.enabledMods != null)
                     {
