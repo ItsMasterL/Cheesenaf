@@ -11,7 +11,7 @@ namespace Cheesenaf
 {
     public class Game1 : Game
     {
-        public const string Version = "1.1.0*";
+        public const string Version = "1.1.0";
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
