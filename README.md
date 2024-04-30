@@ -34,4 +34,4 @@ For Linux:
 dotnet publish -c Release -r linux-x64 /p:PublishReadyToRun=false /p:TieredCompilation=false --self-contained
 ```
 
-For more information, [here is the official monogame packaging page](https://monogame.net/articles/packaging_games.html)
+For more information, [here is the official monogame packaging page](https://docs.monogame.net/articles/packaging_games.html)
